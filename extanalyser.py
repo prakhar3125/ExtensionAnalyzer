@@ -2282,9 +2282,6 @@ def analyze(ext_name, ext_type='local'):
     else:
         return ('error: [analyze.py] Unsupported input!')
 
-    # Direct Analysis: Purge all old reports before starting new one
-    purge_old_data()
-
     core.updatelog('======== Analysis Begins ========')
     try:
         core.updatelog('Reading manifest.json')
@@ -2484,10 +2481,10 @@ def analyze(ext_name, ext_type='local'):
         else:
             return ('error:Something went wrong with the analysis!')
     except Exception as e:
-        core.updatelog(
-            'Something went wrong while reading source of manifest.json file')
-        print(e)
+        core.updatelog('Something went wrong while reading source of manifest.json file')
+        core.updatelog(str(e))
         core.updatelog(logging.error(traceback.format_exc()))
+        return ('error: Something went wrong with the analysis! Check the logs for details.')
 
 
 """
@@ -2625,6 +2622,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 def api_view(query, allargs):
     if query == 'dlanalysis':
+        purge_old_data()
         try:
             extension_id = allargs.get('extid')
             saveas = ""
@@ -2653,6 +2651,7 @@ def api_view(query, allargs):
             return ('error: Something went wrong while downloading extension, check log for more information')
 
     elif query == 'firefoxaddon':
+        purge_old_data()
         try:
             addonurl = allargs.get('addonurl')
             try:
@@ -2673,6 +2672,7 @@ def api_view(query, allargs):
             return ('error: Something went wrong while downloading extension, check log for more information')
 
     elif query == 'edgeaddon':
+        purge_old_data()
         try:
             addonurl = allargs.get('addonurl')
             saveas = addonurl.split('/')[-1]
@@ -2789,6 +2789,7 @@ def api_view(query, allargs):
             return ('error: Incomplete Query')
 
     elif query == 'analyzelocalextension':
+        purge_old_data()
         try:
             browser = allargs.get('browser')
             path_to_local = allargs.get('path')
@@ -3736,6 +3737,7 @@ def home():
 
 @app.route('/upload/', methods=['GET', 'POST'])
 def upload_file():
+    purge_old_data()
     if request.method == 'POST':
         if 'file' not in request.files:
             return ('error: No File uploaded')
