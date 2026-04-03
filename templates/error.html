@@ -2,93 +2,306 @@
 <!--
 ExtAnalysis - Browser Extension Analysis Framework
 Copyright (C) 2019 - 2022 Tuhinshubhra
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published
-by the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
+GNU Affero General Public License v3
 -->
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>{{error_title}} | ION SecOps Extension Analyzer</title>
     <link id="pageStyle" rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/style.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/secops.css') }}">
-    <link href="{{ url_for('static',filename='images/favicon.png') }}" rel="icon"/>
+    <link href="{{ url_for('static',filename='images/favicon.png') }}" rel="icon" />
     <script type="text/javascript" src="{{ url_for('static',filename='js/fontawesome.min.js') }}"></script>
     <link href="{{ url_for('static',filename='css/fontawesome.min.css') }}" rel="stylesheet" type="text/css" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet">
     <style>
         @font-face {
             font-family: "ocraextended";
-            src: url("{{ url_for('static',filename='fonts/ocraextended.ttf') }}") format('truetype');
+            src:url("{{ url_for('static',filename='fonts/ocraextended.ttf') }}") format('truetype');
             font-weight: 400;
             font-style: normal;
         }
+
         @font-face {
             font-family: "Roboto";
-            src: url("{{ url_for('static',filename='fonts/Roboto-Regular.ttf') }}") format('truetype');
+            src:url("{{ url_for('static',filename='fonts/Roboto-Regular.ttf') }}") format('truetype');
             font-weight: 400;
             font-style: normal;
         }
-        /* Roboto italic */
+
         @font-face {
             font-family: "Roboto";
-            src: url("{{ url_for('static',filename='fonts/Roboto-Italic.ttf') }}") format('truetype');
+            src:url("{{ url_for('static',filename='fonts/Roboto-Italic.ttf') }}") format('truetype');
             font-weight: 400;
             font-style: italic;
         }
-        /* Roboto bold */
+
         @font-face {
             font-family: "Roboto";
-            src: url("{{ url_for('static',filename='fonts/Roboto-Bold.ttf') }}") format('truetype');
+            src:url("{{ url_for('static',filename='fonts/Roboto-Bold.ttf') }}") format('truetype');
             font-weight: 700;
             font-style: normal;
         }
+
         @-webkit-keyframes rotation {
-		from {
-				-webkit-transform: rotate(0deg);
-		}
-		to {
-				-webkit-transform: rotate(359deg);
-		}
+            from {
+                -webkit-transform: rotate(0deg)
+            }
+
+            to {
+                -webkit-transform: rotate(359deg)
+            }
+        }
+
+        @keyframes rotation {
+            from {
+                transform: rotate(0deg)
+            }
+
+            to {
+                transform: rotate(359deg)
+            }
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: .4
+            }
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #070b11;
+            --bg2: #0c1220;
+            --card: #0f1929;
+            --border: #1c2e45;
+            --accent: #00d4aa;
+            --danger: #ef4444;
+            --text: #dde6f0;
+            --muted: #4a6080;
+            --mono: 'JetBrains Mono', monospace;
+            --body: 'DM Sans', sans-serif;
+        }
+
+        html,
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--body);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-image: linear-gradient(rgba(239, 68, 68, .02) 1px, transparent 1px), linear-gradient(90deg, rgba(239, 68, 68, .02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+
+        .noscript {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .noscript img {
+            width: 60px;
+            opacity: .5;
+        }
+
+        .wrapper {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* LOGO */
+        .logo-placeholder {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            padding: 1.25rem 2rem;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+        }
+
+        .logo-placeholder::before {
+            content: '';
+            display: block;
+            width: 5px;
+            height: 36px;
+            background: linear-gradient(180deg, var(--danger), #7f1d1d);
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .logo-text {
+            font-family: var(--mono);
+            font-size: .95rem;
+            font-weight: 700;
+            line-height: 1.3;
+            color: var(--text);
+            letter-spacing: .04em;
+        }
+
+        /* CONTAINER */
+        .container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1.5rem;
+        }
+
+        /* ERROR DIV */
+        .error-div {
+            background: var(--card);
+            border: 1px solid rgba(239, 68, 68, .3);
+            border-radius: 12px;
+            padding: 3rem 2.5rem;
+            max-width: 540px;
+            width: 100%;
+            text-align: center;
+            animation: fadeUp .5s ease both;
+            box-shadow: 0 0 48px rgba(239, 68, 68, .07);
+        }
+
+        .error-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            font-family: var(--mono);
+            font-size: .65rem;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--danger);
+            background: rgba(239, 68, 68, .1);
+            border: 1px solid rgba(239, 68, 68, .25);
+            border-radius: 4px;
+            padding: .3rem .75rem;
+            margin-bottom: 1.5rem;
+            animation: pulse 2s ease infinite;
+        }
+
+        .error-div h3 {
+            font-family: var(--mono);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+        }
+
+        .error-gif {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 2px solid rgba(239, 68, 68, .3);
+            -webkit-animation: rotation 20s infinite linear;
+            animation: rotation 20s infinite linear;
+            object-fit: cover;
+            margin-bottom: 1.5rem;
+            opacity: .75;
+        }
+
+        .error-body {
+            font-size: .85rem;
+            color: var(--muted);
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .inline-note {
+            font-family: var(--mono);
+            font-size: .7rem;
+            color: var(--muted);
+            letter-spacing: .04em;
+            margin-top: .5rem;
+        }
+
+        .inline-note a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .inline-note a:hover {
+            text-decoration: underline;
+        }
+
+        /* horizontal rule */
+        hr.err-sep {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 1.5rem 0;
         }
     </style>
 </head>
 
 <body>
     <div class="noscript" id="noscript">
-            <img src="{{ url_for('static',filename='images/error.png') }}">
-            <h1>ION SecOps Extension Analyzer needs javascript enabled to work!</h1>
+        <img src="{{ url_for('static',filename='images/error.png') }}">
+        <h1 style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#4a6080;">JavaScript required to run
+            ION SecOps Extension Analyzer.</h1>
     </div>
+
     <div class="wrapper">
-        <!--
-        <h2>ExtAnalysis</h2>
-        <h6>Browser Extension Analysis Toolkit!</h6>
-        -->
-        <div class="logo-placeholder"><h1 class="logo-text">ION SecOps<br>Extension Analyzer</h1></div>
+        <div class="logo-placeholder" onclick="window.location='/'">
+            <h1 class="logo-text">ION SecOps<br>Extension Analyzer</h1>
+        </div>
 
         <div class="container" id="container">
             <div class="error-div">
+                <div class="error-badge"><i class="fas fa-exclamation-triangle"></i> Error</div>
                 <h3>{{error_head}}</h3>
-                <br>
-                <img src="{{ url_for('static',filename='images/techerror.gif') }}" style="width:200px; -webkit-animation: rotation 20s infinite linear; border-radius: 50%;">
-                <br><br>
-                {{error_txt | safe}}
-                <br>
-                <div class="inline-note">Click on the logo to go back to homepage</div>
+                <img src="{{ url_for('static',filename='images/techerror.gif') }}" class="error-gif">
+                <hr class="err-sep">
+                <div class="error-body">{{error_txt | safe}}</div>
+                <div class="inline-note"><a href="/">← Return to homepage</a></div>
             </div>
         </div>
-
     </div>
+
     <script type="text/javascript" src="{{ url_for('static',filename='js/jquery.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='js/main.js') }}"></script>
 </body>

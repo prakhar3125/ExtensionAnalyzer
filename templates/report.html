@@ -2,517 +2,814 @@
 <!--
 ExtAnalysis - Browser Extension Analysis Framework
 Copyright (C) 2019 - 2022 Tuhinshubhra
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published
-by the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
+GNU Affero General Public License v3
 -->
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>{{basic_info[0]}} - Analysis Report | ION SecOps Extension Analyzer</title>
+  <meta charset="utf-8">
+  <title>{{basic_info[0]}} — Analysis Report | ION SecOps Extension Analyzer</title>
   <script type="text/javascript" src="{{ url_for('static',filename='js/vis.min.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static',filename='js/fontawesome.min.js') }}"></script>
   <link href="{{ url_for('static',filename='css/vis-network.min.css') }}" rel="stylesheet" type="text/css" />
   <link href="{{ url_for('static',filename='css/fontawesome.min.css') }}" rel="stylesheet" type="text/css" />
   <link href="{{ url_for('static',filename='css/result.css') }}" rel="stylesheet" type="text/css" />
-    <link id="pageStyle" rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/style.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bttn.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/secops.css') }}">
-    <link href="{{ url_for('static',filename='images/favicon.png') }}" rel="icon"/>
+  <link id="pageStyle" rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/style.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bttn.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/secops.css') }}">
+  <link href="{{ url_for('static',filename='images/favicon.png') }}" rel="icon" />
   <meta name="csrf-token" content="{{ csrf_token() }}">
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap"
+    rel="stylesheet">
   <style>
     @font-face {
-        font-family: "ocraextended";
-        src: url("{{ url_for('static',filename='fonts/ocraextended.ttf') }}") format('truetype');
-        font-weight: 400;
-        font-style: normal;
+      font-family: "ocraextended";
+      src:url("{{ url_for('static',filename='fonts/ocraextended.ttf') }}") format('truetype');
+      font-weight: 400;
+      font-style: normal;
     }
+
     @font-face {
-        font-family: "Roboto";
-        src: url("{{ url_for('static',filename='fonts/Roboto-Regular.ttf') }}") format('truetype');
-        font-weight: 400;
-        font-style: normal;
+      font-family: "Roboto";
+      src:url("{{ url_for('static',filename='fonts/Roboto-Regular.ttf') }}") format('truetype');
+      font-weight: 400;
+      font-style: normal;
     }
-    /* Roboto italic */
+
     @font-face {
-        font-family: "Roboto";
-        src: url("{{ url_for('static',filename='fonts/Roboto-Italic.ttf') }}") format('truetype');
-        font-weight: 400;
-        font-style: italic;
+      font-family: "Roboto";
+      src:url("{{ url_for('static',filename='fonts/Roboto-Italic.ttf') }}") format('truetype');
+      font-weight: 400;
+      font-style: italic;
     }
-    /* Roboto bold */
+
     @font-face {
-        font-family: "Roboto";
-        src: url("{{ url_for('static',filename='fonts/Roboto-Bold.ttf') }}") format('truetype');
-        font-weight: 700;
-        font-style: normal;
+      font-family: "Roboto";
+      src:url("{{ url_for('static',filename='fonts/Roboto-Bold.ttf') }}") format('truetype');
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #070b11;
+      --bg2: #0c1220;
+      --card: #0f1929;
+      --border: #1c2e45;
+      --accent: #00d4aa;
+      --accent2: #3b82f6;
+      --danger: #ef4444;
+      --warn: #f59e0b;
+      --text: #dde6f0;
+      --muted: #4a6080;
+      --mono: 'JetBrains Mono', monospace;
+      --body: 'DM Sans', sans-serif;
+    }
+
+    html,
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--body);
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background-image: linear-gradient(rgba(0, 212, 170, .025) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 212, 170, .025) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    .noscript {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 9999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      font-family: var(--mono);
+    }
+
+    .noscript img {
+      width: 60px;
+      opacity: .5;
+    }
+
+    /* LOGO BAR */
+    .logo-placeholder {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: 1.25rem 2rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    .logo-placeholder::before {
+      content: '';
+      display: block;
+      width: 5px;
+      height: 36px;
+      background: linear-gradient(180deg, var(--accent), var(--accent2));
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    .logo-text {
+      font-family: var(--mono);
+      font-size: .9rem;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: .04em;
+      color: var(--text);
+    }
+
+    .logo-text span {
+      color: var(--accent);
+    }
+
+    .logo-placeholder a {
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+
+    .logo-placeholder a::before {
+      content: '';
+      display: block;
+      width: 5px;
+      height: 36px;
+      background: linear-gradient(180deg, var(--accent), var(--accent2));
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(7, 11, 17, .85);
+      backdrop-filter: blur(4px);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2rem;
+      width: 90%;
+      max-width: 520px;
+      position: relative;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      cursor: pointer;
+      opacity: .6;
+      transition: opacity .2s;
+    }
+
+    .close-modal:hover {
+      opacity: 1;
+    }
+
+    .close-modal svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* EXT INFO HEADER */
+    .ext-info-main {
+      position: relative;
+      z-index: 1;
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
+    }
+
+    .ext-info-body {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .ext-info-col1 {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .ext-info-name {
+      font-family: var(--mono);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: .02em;
+      margin-bottom: .6rem;
+    }
+
+    .ext-info-others {
+      display: flex;
+      flex-direction: column;
+      gap: .3rem;
+    }
+
+    .ext-info-description {
+      font-size: .82rem;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: .25rem;
+    }
+
+    .ext-info-version,
+    .ext-info-author,
+    .ext-info-last-scanned {
+      font-family: var(--mono);
+      font-size: .72rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+
+    .ext-info-version i {
+      color: var(--accent2);
+    }
+
+    .ext-info-author i {
+      color: var(--accent);
+    }
+
+    .ext-info-last-scanned i {
+      color: var(--warn);
+    }
+
+    .ext-info-col2 {
+      display: flex;
+      align-items: center;
+    }
+
+    .ext-info-col2 img {
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      max-width: 72px;
+    }
+
+    .ext-info-col3 {
+      display: flex;
+      gap: .5rem;
+      align-items: center;
+    }
+
+    .bttn-material-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .8rem;
+      transition: opacity .2s;
+    }
+
+    .bttn-primary {
+      background: var(--accent2);
+      color: #fff;
+    }
+
+    .bttn-danger {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .bttn-material-circle:hover {
+      opacity: .8;
+    }
+
+    /* MAIN CONTENT */
+    .report-body {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 2rem 4rem;
+    }
+
+    /* RESULT TABS */
+    .tabscontainer {
+      width: 100%;
+    }
+
+    ul.result-tabs {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: .25rem;
+      margin-bottom: 1.75rem;
+      padding: 4px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    ul.result-tabs li {
+      font-family: var(--mono);
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: .55rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background .2s, color .2s;
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+
+    ul.result-tabs li.current,
+    ul.result-tabs li:hover {
+      background: var(--card);
+      color: var(--accent);
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeUp .3s ease both;
+    }
+
+    .tab-content.current {
+      display: block;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    /* SECTION CARDS */
+    .sub_section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 1.25rem;
+    }
+
+    .mid-head {
+      font-family: var(--mono);
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      padding: .8rem 1.25rem;
+      background: rgba(0, 212, 170, .05);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    .sub_body {
+      padding: 1.25rem;
+    }
+
+    /* SCAN INFO STATS */
+    .stats-qa {
+      display: inline-flex;
+      align-items: baseline;
+      gap: .4rem;
+      margin-right: 1.25rem;
+      margin-bottom: .6rem;
+    }
+
+    .stats-q {
+      font-family: var(--mono);
+      font-size: .7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .stats-a {
+      font-family: var(--mono);
+      font-size: .8rem;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* FILES TAB - STATS HOLDER */
+    .stats-holder {
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    @media(max-width:680px) {
+      .stats-holder {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .stats {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .stats_head {
+      font-family: var(--mono);
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      padding: .8rem 1.25rem;
+      background: rgba(0, 212, 170, .05);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    .stats_body {
+      padding: 1.25rem;
+    }
+
+    #resultnetwork {
+      width: 100%;
+      height: 360px;
+    }
+
+    .stats_pill {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .45rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stats_pill:last-child {
+      border-bottom: none;
+    }
+
+    .stats_pill img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+
+    .stats_data {
+      font-family: var(--mono);
+      font-size: .75rem;
+      color: var(--text);
+    }
+
+    .stats_body center {
+      margin-top: .75rem;
+    }
+
+    /* PERMISSIONS */
+    .p-holder {
+      padding: .25rem 0;
+    }
+
+    .inline-note {
+      font-family: var(--mono);
+      font-size: .72rem;
+      color: var(--muted);
+      margin-top: .75rem;
+    }
+
+    .inline-note b {
+      color: var(--accent);
+    }
+
+    /* ACTION BUTTONS */
+    .start_scan {
+      background: var(--accent);
+      color: #05110e;
+      font-family: var(--mono);
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      border: none;
+      border-radius: 6px;
+      padding: .6rem 1.2rem;
+      cursor: pointer;
+      transition: opacity .2s, transform .15s;
+    }
+
+    .start_scan:hover {
+      opacity: .85;
+      transform: translateY(-1px);
     }
   </style>
 </head>
+
 <body>
   <div class="noscript" id="noscript">
-            <img src="{{ url_for('static',filename='images/error.png') }}">
-            <h1>ION SecOps Extension Analyzer needs javascript enabled to work!</h1>
+    <img src="{{ url_for('static',filename='images/error.png') }}">
+    <h1 style="font-family:var(--mono);font-size:.85rem;color:var(--muted);">JavaScript required to run ION SecOps
+      Extension Analyzer.</h1>
   </div>
-  <div class="logo-placeholder"><a href='/'><h1 class="logo-text" style="font-size:1.5rem">ION SecOps Extension Analyzer</h1></a></div>
-    <div class="ext-info-main">
-      <!--div class="ext-info-img">
-        <span class="risk-span">75</span>
-      </div>-->
-              <!-- modal -->
-        <div class="modal-overlay">
-            <div class="modal">
 
-                <a class="close-modal">
-                    <svg viewBox="0 0 20 20">
-                        <path fill="#ff1424" d="M15.898,4.045c-0.271-0.272-0.713-0.272-0.986,0l-4.71,4.711L5.493,4.045c-0.272-0.272-0.714-0.272-0.986,0s-0.272,0.714,0,0.986l4.709,4.711l-4.71,4.711c-0.272,0.271-0.272,0.713,0,0.986c0.136,0.136,0.314,0.203,0.492,0.203c0.179,0,0.357-0.067,0.493-0.203l4.711-4.711l4.71,4.711c0.137,0.136,0.314,0.203,0.494,0.203c0.178,0,0.355-0.067,0.492-0.203c0.273-0.273,0.273-0.715,0-0.986l-4.711-4.711l4.711-4.711C16.172,4.759,16.172,4.317,15.898,4.045z"></path>
-                    </svg>
-                </a>
-                <!-- close modal -->
+  <div class="logo-placeholder">
+    <a href="/">
+      <h1 class="logo-text">ION <span>SecOps</span><br>Extension Analyzer</h1>
+    </a>
+  </div>
 
-                <div class="modal-content" id="modal-content">
-                    <h3>Some content here</h3>
-                </div>
-                <!-- content -->
-
-            </div>
-            <!-- modal -->
-        </div>
-        <!-- overlay --> 
-      <div class="ext-info-body">
-        <div class="ext-info-col1">
-          <div class="ext-info-name">
-            {{basic_info[0]}}
-          </div>
-          <div class="ext-info-others">
-            <div class="ext-info-description">
-                {{basic_info[3]}}
-            </div>
-              <div class="ext-info-version">
-                  <i class="fas fa-code-branch"></i> {{basic_info[1]}}
-              </div>
-              <div class="ext-info-author">
-                  <i class="fas fa-user-astronaut"></i> {{basic_info[2]}}
-              </div>
-              <div class="ext-info-last-scanned">
-                  <i class="fab fa-slack-hash"></i> {{analysis_id}}
-              </div>
-          </div>
-        </div>
-        <div class="ext-info-col2">
-            {{basic_info[4]}}
-        </div>
-        <div class="ext-info-col3">
-            <button class="bttn-material-circle bttn-xs bttn-primary" style=" margin: 5px; "><i class="fas fa-sync-alt"></i></button>
-            <button class="bttn-material-circle bttn-xs bttn-danger" style=" margin: 5px; "><i class="fas fa-trash-alt"></i></button>
+  <div class="ext-info-main">
+    <!-- modal -->
+    <div class="modal-overlay">
+      <div class="modal">
+        <a class="close-modal">
+          <svg viewBox="0 0 20 20">
+            <path fill="#ef4444"
+              d="M15.898,4.045c-0.271-0.272-0.713-0.272-0.986,0l-4.71,4.711L5.493,4.045c-0.272-0.272-0.714-0.272-0.986,0s-0.272,0.714,0,0.986l4.709,4.711l-4.71,4.711c-0.272,0.271-0.272,0.713,0,0.986c0.136,0.136,0.314,0.203,0.492,0.203c0.179,0,0.357-0.067,0.493-0.203l4.711-4.711l4.71,4.711c0.137,0.136,0.314,0.203,0.494,0.203c0.178,0,0.355-0.067,0.492-0.203c0.273-0.273,0.273-0.715,0-0.986l-4.711-4.711l4.711-4.711C16.172,4.759,16.172,4.317,15.898,4.045z" />
+          </svg>
+        </a>
+        <div class="modal-content" id="modal-content">
+          <h3>Some content here</h3>
         </div>
       </div>
     </div>
-    <br><br>
-    <div class="tabscontainer">
 
+    <div class="ext-info-body">
+      <div class="ext-info-col1">
+        <div class="ext-info-name">{{basic_info[0]}}</div>
+        <div class="ext-info-others">
+          <div class="ext-info-description">{{basic_info[3]}}</div>
+          <div class="ext-info-version"><i class="fas fa-code-branch"></i> {{basic_info[1]}}</div>
+          <div class="ext-info-author"><i class="fas fa-user-astronaut"></i> {{basic_info[2]}}</div>
+          <div class="ext-info-last-scanned"><i class="fab fa-slack-hash"></i> {{analysis_id}}</div>
+        </div>
+      </div>
+      <div class="ext-info-col2">{{basic_info[4]}}</div>
+      <div class="ext-info-col3">
+        <button class="bttn-material-circle bttn-primary" style="margin:5px;"><i class="fas fa-sync-alt"></i></button>
+        <button class="bttn-material-circle bttn-danger" style="margin:5px;"><i class="fas fa-trash-alt"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="report-body">
+    <div class="tabscontainer">
       <ul class="result-tabs">
         <li class="tab-link current" data-tab="tab-0"><i class="fas fa-tree"></i> Basic Info</li>
         <li class="tab-link" data-tab="tab-3"><i class="fas fa-clone"></i> Files</li>
         <li class="tab-link" data-tab="tab-1"><i class="fas fa-heartbeat"></i> Permissions</li>
-        <li class="tab-link" data-tab="tab-2"><i class="fas fa-link"></i> URLs & Domains</li>
+        <li class="tab-link" data-tab="tab-2"><i class="fas fa-link"></i> URLs &amp; Domains</li>
         <li class="tab-link" data-tab="tab-4"><i class="fas fa-fingerprint"></i> Gathered Intels</li>
       </ul>
 
-
+      <!-- TAB 0: BASIC INFO -->
       <div id="tab-0" class="tab-content current">
         <div class="sub_section">
-          <div class="mid-head">
-            <i class="fas fa-search"></i> Scan Info
-          </div>
+          <div class="mid-head"><i class="fas fa-search"></i> Scan Info</div>
           <div class="sub_body">
-              <span class="stats-qa"><span class="stats-q">Analysis ID: </span> <span class="stats-a">{{analysis_id}}</span></span>
-              <span class="stats-qa"><span class="stats-q">Name: </span> <span class="stats-a">{{basic_info[0]}}</span></span>
-              <span class="stats-qa"><span class="stats-q">Version: </span> <span class="stats-a">{{basic_info[1]}}</span></span>
-              <span class="stats-qa"><span class="stats-q">Author: </span> <span class="stats-a">{{basic_info[2]}}</span></span>
-              <span class="stats-qa"><span class="stats-q">Type: </span> <span class="stats-a">{{extension_type | safe}}</span></span>
-              <span class="stats-qa"><span class="stats-q">Permissions: </span> <span class="stats-a">{{permissions_count}}</span></span>
-              <span class="stats-qa"><span class="stats-q">Unique Domains: </span> <span class="stats-a">{{unique_domains}}</span></span>
-              <span class="stats-qa"><span class="stats-q">Extracted URLs: </span> <span class="stats-a">{{urls_count}}</span></span>
-              <span class="stats-qa"><span class="stats-q">External JavaScript: </span> <span class="stats-a">{{extjs_count}}</span></span>
+            <span class="stats-qa"><span class="stats-q">Analysis ID:</span><span
+                class="stats-a">{{analysis_id}}</span></span>
+            <span class="stats-qa"><span class="stats-q">Name:</span><span
+                class="stats-a">{{basic_info[0]}}</span></span>
+            <span class="stats-qa"><span class="stats-q">Version:</span><span
+                class="stats-a">{{basic_info[1]}}</span></span>
+            <span class="stats-qa"><span class="stats-q">Author:</span><span
+                class="stats-a">{{basic_info[2]}}</span></span>
+            <span class="stats-qa"><span class="stats-q">Type:</span><span class="stats-a">{{extension_type |
+                safe}}</span></span>
+            <span class="stats-qa"><span class="stats-q">Permissions:</span><span
+                class="stats-a">{{permissions_count}}</span></span>
+            <span class="stats-qa"><span class="stats-q">Unique Domains:</span><span
+                class="stats-a">{{unique_domains}}</span></span>
+            <span class="stats-qa"><span class="stats-q">Extracted URLs:</span><span
+                class="stats-a">{{urls_count}}</span></span>
+            <span class="stats-qa"><span class="stats-q">External JavaScript:</span><span
+                class="stats-a">{{extjs_count}}</span></span>
           </div>
         </div>
-          <div class="sub_section">
-              <div class="mid-head">
-                  <i class="fas fa-tree"></i> manifest.json
-              </div>
-              <div class="sub_body">
-                  <div id="manifest-content"></div>
-                  <br>
-              </div>
-            </div>
+        <div class="sub_section">
+          <div class="mid-head"><i class="fas fa-tree"></i> manifest.json</div>
+          <div class="sub_body">
+            <div id="manifest-content"></div>
+            <br>
+          </div>
+        </div>
       </div>
+
+      <!-- TAB 3: FILES -->
       <div id="tab-3" class="tab-content">
         <div class="stats-holder">
           <div class="stats">
-              <div class="stats_head"><i class="fas fa-network-wired"></i> Files & URLs Graph</div>
-              <div id="resultnetwork"></div>
+            <div class="stats_head"><i class="fas fa-network-wired"></i> Files &amp; URLs Graph</div>
+            <div id="resultnetwork"></div>
           </div>
-          
           <div class="stats">
             <div class="stats_head"><i class="fas fa-chart-pie"></i> Statistics</div>
             <div class="stats_body">
-              <div class="stats_pill">
-                  <img src="{{ url_for('static',filename='images/html1.png') }}">
-                  <div class="stats_data">{{html_files_count}} File(s)</div>
+              <div class="stats_pill"><img src="{{ url_for('static',filename='images/html1.png') }}">
+                <div class="stats_data">{{html_files_count}} File(s)</div>
               </div>
-              <div class="stats_pill">
-                  <img src="{{ url_for('static',filename='images/js1.png') }}">
-                  <div class="stats_data">{{js_files_count}} File(s)</div>
+              <div class="stats_pill"><img src="{{ url_for('static',filename='images/js1.png') }}">
+                <div class="stats_data">{{js_files_count}} File(s)</div>
               </div>
-              <div class="stats_pill">
-                  <img src="{{ url_for('static',filename='images/json1.png') }}">
-                  <div class="stats_data">{{json_files_count}} File(s)</div>
+              <div class="stats_pill"><img src="{{ url_for('static',filename='images/json1.png') }}">
+                <div class="stats_data">{{json_files_count}} File(s)</div>
               </div>
-              <div class="stats_pill">
-                  <img src="{{ url_for('static',filename='images/css1.png') }}">
-                  <div class="stats_data">{{css_files_count}} File(s)</div>
+              <div class="stats_pill"><img src="{{ url_for('static',filename='images/css1.png') }}">
+                <div class="stats_data">{{css_files_count}} File(s)</div>
               </div>
-              <div class="stats_pill">
-                  <img src="{{ url_for('static',filename='images/static1.png') }}">
-                  <div class="stats_data">{{static_files_count}} File(s)</div>
+              <div class="stats_pill"><img src="{{ url_for('static',filename='images/static1.png') }}">
+                <div class="stats_data">{{static_files_count}} File(s)</div>
               </div>
-              <div class="stats_pill">
-                  <img src="{{ url_for('static',filename='images/other1.png') }}">
-                  <div class="stats_data">{{other_files_count}} File(s)</div>
+              <div class="stats_pill"><img src="{{ url_for('static',filename='images/other1.png') }}">
+                <div class="stats_data">{{other_files_count}} File(s)</div>
               </div>
-              <center>
-                <button class="start_scan" onclick=viewGraph()><i class="fas fa-external-link-alt"></i> View Large Graph</button>
-              </center>
+              <center><button class="start_scan" onclick="viewGraph()"><i class="fas fa-external-link-alt"></i> View
+                  Large Graph</button></center>
             </div>
           </div>
         </div>
-          <br>
-          <div class="sub_section">
-            <div class="mid-head">
-                <i class="fas fa-code"></i> View source code of files!
-            </div>
-            <div class="sub_body">
-                {{files_table | safe}}
-                <br>
-                <div class="inline-note">Only <b>Javascript</b>, <b>CSS</b>, <b>HTML</b> & <b>JSON</b> Files are saved since they contain all the code!</div>
-            </div>
+        <div class="sub_section">
+          <div class="mid-head"><i class="fas fa-code"></i> View Source Code of Files</div>
+          <div class="sub_body">
+            {{files_table | safe}}
+            <br>
+            <div class="inline-note">Only <b>Javascript</b>, <b>CSS</b>, <b>HTML</b> &amp; <b>JSON</b> files are saved
+              since they contain all the code.</div>
           </div>
+        </div>
       </div>
+
+      <!-- TAB 1: PERMISSIONS -->
       <div id="tab-1" class="tab-content">
-        <div class="p-holder">
-          {{permissions_div | safe}}
+        <div class="p-holder">{{permissions_div | safe}}</div>
+        <div class="inline-note">Click on a permission <i class="fas fa-hand-point-up"></i> to learn more about it.
         </div>
-        <div class="inline-note">Click on the Permission <i class="fas fa-hand-point-up"></i> to learn more about it!</div>
       </div>
+
+      <!-- TAB 2: URLs & DOMAINS -->
       <div id="tab-2" class="tab-content">
-          <div class="sub_section">
-              <div class="mid-head">
-                  <i class="fas fa-globe-asia"></i> Domains!
-              </div>
-              <div class="sub_body">
-                  {{domains_table | safe}}
-                  <br>
-              </div>
-            </div>
-
-          <div class="sub_section">
-              <div class="mid-head">
-                  <i class="fas fa-link"></i> Extracted URLS from files!
-              </div>
-              <div class="sub_body">
-                  {{urls_table | safe}}
-                  <br>
-              </div>
-          </div>
-
-          <div class="sub_section">
-            <div class="mid-head">
-              <i class="fab fa-js-square"></i> External JavaScript Files!
-            </div>
-            <div class="sub_body">
-                {{extjs_table | safe}}
-                <br>
-            </div>
+        <div class="sub_section">
+          <div class="mid-head"><i class="fas fa-globe-asia"></i> Domains</div>
+          <div class="sub_body">{{domains_table | safe}}<br></div>
         </div>
-         
+        <div class="sub_section">
+          <div class="mid-head"><i class="fas fa-link"></i> Extracted URLs from Files</div>
+          <div class="sub_body">{{urls_table | safe}}<br></div>
+        </div>
+        <div class="sub_section">
+          <div class="mid-head"><i class="fab fa-js-square"></i> External JavaScript Files</div>
+          <div class="sub_body">{{extjs_table | safe}}<br></div>
+        </div>
       </div>
+
+      <!-- TAB 4: GATHERED INTELS -->
       <div id="tab-4" class="tab-content">
-          <div class="sub_section">
-              <div class="mid-head">
-                  <i class="fas fa-map-marker-alt"></i> Extracted IP Addresses
-              </div>
-              <div class="sub_body">
-                  {{ips_table | safe}}
-                  <br>
-              </div>
-            </div>
-
-
-            <div class="sub_section">
-                <div class="mid-head">
-                    <i class="fab fa-btc"></i> Extracted Bitcoin Addresses
-                </div>
-                <div class="sub_body">
-                    {{btc_table | safe}}
-                    <br>
-                </div>
-            </div>
-
-
-            <div class="sub_section">
-              <div class="mid-head">
-                  <i class="fas fa-at"></i> Extracted Email Addresses
-              </div>
-              <div class="sub_body">
-                  {{mails_table | safe}}
-                  <br>
-              </div>
-            </div>
-
-            <div class="sub_section">
-                <div class="mid-head">
-                    <i class="fas fa-comment-alt"></i> Extracted Comments
-                </div>
-                <div class="sub_body">
-                    {{comments_table | safe}}
-                    <br>
-                </div>
-            </div>
-
-            <div class="sub_section">
-                <div class="mid-head">
-                    <i class="fas fa-key"></i> Extracted Base64 Encoded strings
-                </div>
-                <div class="sub_body">
-                    {{base64_table | safe}}
-                    <br>
-                </div>
-            </div>
-
-
+        <div class="sub_section">
+          <div class="mid-head"><i class="fas fa-map-marker-alt"></i> Extracted IP Addresses</div>
+          <div class="sub_body">{{ips_table | safe}}<br></div>
+        </div>
+        <div class="sub_section">
+          <div class="mid-head"><i class="fab fa-btc"></i> Extracted Bitcoin Addresses</div>
+          <div class="sub_body">{{btc_table | safe}}<br></div>
+        </div>
+        <div class="sub_section">
+          <div class="mid-head"><i class="fas fa-at"></i> Extracted Email Addresses</div>
+          <div class="sub_body">{{mails_table | safe}}<br></div>
+        </div>
+        <div class="sub_section">
+          <div class="mid-head"><i class="fas fa-comment-alt"></i> Extracted Comments</div>
+          <div class="sub_body">{{comments_table | safe}}<br></div>
+        </div>
+        <div class="sub_section">
+          <div class="mid-head"><i class="fas fa-key"></i> Extracted Base64 Encoded Strings</div>
+          <div class="sub_body">{{base64_table | safe}}<br></div>
+        </div>
       </div>
-
     </div>
-
   </div>
 
-
-
-
-
-<script type="text/javascript">
-var imagedir = "{{ url_for('static',filename='images/') }}";
-
-{{graph_data|safe}}
-// create a network
-  var container = document.getElementById('resultnetwork');
-  var data = {
-    nodes: nodes,
-    edges: edges
-  };
-  var options = {
-    physics: {
-        adaptiveTimestep: true,
-        barnesHut: {
-            gravitationalConstant: -8000,
-            springConstant: 0.04,
-            springLength: 95
-        },
-        stabilization: {
-            iterations: 987
-        }
-    },
-    layout: {
-        randomSeed: 191006,
-        improvedLayout: false
-    },
-    interaction: {
-        hideEdgesOnDrag: true,
-        tooltipDelay: 200
-      },
-    edges: {
-        smooth: {
-            type: 'continuous',
-            forceDirection: 'horizontal',
-            roundness: 0.4
-        }
-    },
-    nodes: {
-      size: 20,
-            font: {
-                size: 15,
-                color: '#89ff00'
-            }
-    }, 
+  <script type="text/javascript">
+    var imagedir = "{{ url_for('static',filename='images/') }}";
+    {{ graph_data | safe }}
+    var container = document.getElementById('resultnetwork');
+    var data = { nodes: nodes, edges: edges };
+    var options = {
+      physics: { adaptiveTimestep: true, barnesHut: { gravitationalConstant: -8000, springConstant: 0.04, springLength: 95 }, stabilization: { iterations: 987 } },
+      layout: { randomSeed: 191006, improvedLayout: false },
+      interaction: { hideEdgesOnDrag: true, tooltipDelay: 200 },
+      edges: { smooth: { type: 'continuous', forceDirection: 'horizontal', roundness: 0.4 } },
+      nodes: { size: 20, font: { size: 15, color: '#00d4aa' } },
       groups: {
-          extension: {
-            shape: 'image',
-            image: {
-                unselected:imagedir + 'extension0.png',
-                selected:imagedir + 'extension1.png'
-            },
-            /** fixed: true,  **/
-            /** physics:false **/
-          },
-          html: {
-            shape: 'image',
-            image: {
-                unselected:imagedir + 'html0.png',
-                selected:imagedir + 'html1.png'
-            },
-            /** fixed: true,  **/
-            /** physics:false **/
-          },
-          css: {
-            shape: 'image',
-            image: {
-                unselected:imagedir + 'css0.png',
-                selected:imagedir + 'css1.png'
-            },
-            /** fixed: true,  **/
-            /** physics:false **/
-          },
-          static: {
-            shape: 'image',
-            image: {
-                unselected:imagedir + 'static0.png',
-                selected:imagedir + 'static1.png'
-            },
-            /** fixed: true,  **/
-            /** physics:false **/
-          },
-          js: {
-            shape: 'image',
-            image: {
-                unselected:imagedir + 'js0.png',
-                selected:imagedir + 'js1.png'
-            },
-            /** fixed: true,  **/
-            /** physics:false **/
-          },
-          json: {
-            shape: 'image',
-            image: {
-                unselected:imagedir + 'json0.png',
-                selected:imagedir + 'json1.png'
-            },
-            /** fixed: true,  **/
-            /** physics:false **/
-          },
-          other: {
-            shape: 'image',
-            image: {
-                unselected:imagedir + 'other0.png',
-                selected:imagedir + 'other1.png'
-            },
-            /** fixed: true,  **/
-            /** physics:false **/
-          },
-          directory: {
-            shape: 'image',
-            image: {
-                unselected:imagedir + 'directory0.png',
-                selected:imagedir + 'directory1.png'
-            },
-            /** fixed: true,  **/
-            /** physics:false **/
-          },
-          url: {
-            shape: 'image',
-            image: {
-                unselected:imagedir + 'url0.png',
-                selected:imagedir + 'url1.png'
-            },
-            /** fixed: true,  **/
-            /** physics:false, **/
-            /** font: {size:12, color:'blue', face:'sans', background:'white'} **/
-          }
+        extension: { shape: 'image', image: { unselected: imagedir + 'extension0.png', selected: imagedir + 'extension1.png' } },
+        html: { shape: 'image', image: { unselected: imagedir + 'html0.png', selected: imagedir + 'html1.png' } },
+        css: { shape: 'image', image: { unselected: imagedir + 'css0.png', selected: imagedir + 'css1.png' } },
+        static: { shape: 'image', image: { unselected: imagedir + 'static0.png', selected: imagedir + 'static1.png' } },
+        js: { shape: 'image', image: { unselected: imagedir + 'js0.png', selected: imagedir + 'js1.png' } },
+        json: { shape: 'image', image: { unselected: imagedir + 'json0.png', selected: imagedir + 'json1.png' } },
+        other: { shape: 'image', image: { unselected: imagedir + 'other0.png', selected: imagedir + 'other1.png' } },
+        directory: { shape: 'image', image: { unselected: imagedir + 'directory0.png', selected: imagedir + 'directory1.png' } },
+        url: { shape: 'image', image: { unselected: imagedir + 'url0.png', selected: imagedir + 'url1.png' } }
       }
-  };
-  var network = new vis.Network(container, data, options);
-  network.on( 'click', function(properties) {
-    var ids = properties.nodes;
-    var clickedNodes = nodes.get(ids);
-    try{
-        if (clickedNodes[0]['group'] === 'url'){
-        alert(clickedNodes[0]['label']);
-        // add a sweetalert and do shits with the url
-        }
-        // add edit option for js/html/json and css files
-    } catch {
-        console.log('Handled exception like a boss! - lame yeah i know i wanna die');
+    };
+    var network = new vis.Network(container, data, options);
+    network.on('click', function (properties) {
+      var ids = properties.nodes;
+      var clickedNodes = nodes.get(ids);
+      try {
+        if (clickedNodes[0]['group'] === 'url') { alert(clickedNodes[0]['label']); }
+      } catch { console.log('Handled exception like a boss! - lame yeah i know i wanna die'); }
+    });
+  </script>
+
+  <script type="text/javascript" src="{{ url_for('static',filename='js/jquery.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static',filename='js/sweetalert.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static',filename='js/main.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static',filename='js/datatables.min.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static',filename='js/jsonTree.js') }}"></script>
+  <script>
+    $(document).ready(function () {
+      $('ul.result-tabs li').click(function () {
+        var tab_id = $(this).attr('data-tab');
+        $('ul.result-tabs li').removeClass('current');
+        $('.tab-content').removeClass('current');
+        $(this).addClass('current');
+        $("#" + tab_id).addClass('current');
+      });
+      $('#files-table').DataTable();
+      $('#urls-table').DataTable();
+      $('#domains-table').DataTable();
+      $('#ips_table').DataTable();
+      $('#mails_table').DataTable();
+      $('#btc_table').DataTable();
+      $('#comments_table').DataTable();
+      $('#base64_table').DataTable();
+      $('#extjs_table').DataTable();
+    });
+    $(function () { $("#loading").fadeOut("slow"); });
+    $(function () {
+      $('.accordion .accordion__question').on('click', function () {
+        var answer = $(this).next();
+        $('.accordion .accordion__answer:visible').not(answer).slideUp(400);
+        answer.slideToggle(400);
+      });
+    });
+    var wrapper = document.getElementById("manifest-content");
+    var data = {{ manifest_content | safe}};
+    try { var data = JSON.parse(data); } catch (e) { }
+    var tree = jsonTree.create(data, wrapper);
+    tree.expand(function (node) { return node.childNodes.length < 2 || node.label === 'phoneNumbers'; });
+    function viewGraph() {
+      var final_url = '/view-graph/' + '{{analysis_id}}';
+      window.open(final_url, target = "_blank");
     }
-
-});
-
-
-</script>
-<script type="text/javascript" src="{{ url_for('static',filename='js/jquery.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static',filename='js/sweetalert.min.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static',filename='js/main.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static',filename='js/datatables.min.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static',filename='js/jsonTree.js') }}"></script>
-<script>
-$(document).ready(function(){
-
-	$('ul.result-tabs li').click(function(){
-		var tab_id = $(this).attr('data-tab');
-
-		$('ul.result-tabs li').removeClass('current');
-		$('.tab-content').removeClass('current');
-
-		$(this).addClass('current');
-		$("#"+tab_id).addClass('current');
-  });
-  $('#files-table').DataTable();
-  $('#urls-table').DataTable();
-  $('#domains-table').DataTable();
-  $('#ips_table').DataTable();
-  $('#mails_table').DataTable();
-  $('#btc_table').DataTable();
-  $('#comments_table').DataTable();
-  $('#base64_table').DataTable();
-  $('#extjs_table').DataTable();
-});
-
-$(function() {
-	$("#loading").fadeOut("slow");
-  });
-  $(function(){
-	$('.accordion .accordion__question').on('click', function(){
-		var answer = $(this).next();
-		$('.accordion .accordion__answer:visible').not(answer).slideUp(400);
-		answer.slideToggle(400);
-	});
-});
-
-var wrapper = document.getElementById("manifest-content");
-var data = {{manifest_content | safe}}
-try {
-    var data = JSON.parse(data);
-} catch (e) {}
-var tree = jsonTree.create(data, wrapper);
-tree.expand(function(node) {
-   return node.childNodes.length < 2 || node.label === 'phoneNumbers';
-});
-
-
-function viewGraph(){
-  var final_url = '/view-graph/' + '{{analysis_id}}';
-  window.open(final_url, target = "_blank");
-}
-</script>
-<br><br>
+  </script>
+  <br><br>
 </body>
+
 </html>

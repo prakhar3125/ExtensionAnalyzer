@@ -2,22 +2,11 @@
 <!--
 ExtAnalysis - Browser Extension Analysis Framework
 Copyright (C) 2019 - 2022 Tuhinshubhra
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published
-by the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
+GNU Affero General Public License v3
 -->
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>Graph Viewer | ION SecOps Extension Analyzer</title>
@@ -29,49 +18,281 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <link href="{{ url_for('static',filename='css/result.css') }}" rel="stylesheet" type="text/css" />
     <link id="pageStyle" rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/style.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/secops.css') }}">
-    <link href="{{ url_for('static',filename='images/favicon.png') }}" rel="icon"/>
+    <link href="{{ url_for('static',filename='images/favicon.png') }}" rel="icon" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet">
     <style>
         @font-face {
             font-family: "ocraextended";
-            src: url("{{ url_for('static',filename='fonts/ocraextended.ttf') }}") format('truetype');
+            src:url("{{ url_for('static',filename='fonts/ocraextended.ttf') }}") format('truetype');
             font-weight: 400;
             font-style: normal;
         }
+
         @font-face {
             font-family: "Roboto";
-            src: url("{{ url_for('static',filename='fonts/Roboto-Regular.ttf') }}") format('truetype');
+            src:url("{{ url_for('static',filename='fonts/Roboto-Regular.ttf') }}") format('truetype');
             font-weight: 400;
             font-style: normal;
         }
-        /* Roboto italic */
+
         @font-face {
             font-family: "Roboto";
-            src: url("{{ url_for('static',filename='fonts/Roboto-Italic.ttf') }}") format('truetype');
+            src:url("{{ url_for('static',filename='fonts/Roboto-Italic.ttf') }}") format('truetype');
             font-weight: 400;
             font-style: italic;
         }
-        /* Roboto bold */
+
         @font-face {
             font-family: "Roboto";
-            src: url("{{ url_for('static',filename='fonts/Roboto-Bold.ttf') }}") format('truetype');
+            src:url("{{ url_for('static',filename='fonts/Roboto-Bold.ttf') }}") format('truetype');
             font-weight: 700;
             font-style: normal;
         }
-        
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #070b11;
+            --bg2: #0c1220;
+            --card: #0f1929;
+            --border: #1c2e45;
+            --accent: #00d4aa;
+            --accent2: #3b82f6;
+            --text: #dde6f0;
+            --muted: #4a6080;
+            --mono: 'JetBrains Mono', monospace;
+            --body: 'DM Sans', sans-serif;
+        }
+
+        html,
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--body);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .noscript {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .noscript img {
+            width: 60px;
+            opacity: .5;
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* LOADING OVERLAY */
+        #loading {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.25rem;
+            transition: opacity .4s;
+        }
+
+        #loading img {
+            width: 56px;
+            opacity: .7;
+        }
+
+        #loading h4 {
+            font-family: var(--mono);
+            font-size: .78rem;
+            color: var(--muted);
+            letter-spacing: .06em;
+        }
+
+        /* LOGO BAR */
+        .logo-placeholder {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            padding: .9rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg);
+            flex-shrink: 0;
+            z-index: 10;
+            position: relative;
+        }
+
+        .logo-placeholder::before {
+            content: '';
+            display: block;
+            width: 4px;
+            height: 30px;
+            background: linear-gradient(180deg, var(--accent), var(--accent2));
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .logo-placeholder a {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+        }
+
+        .logo-text {
+            font-family: var(--mono);
+            font-size: .85rem;
+            font-weight: 700;
+            line-height: 1.3;
+            color: var(--text);
+            letter-spacing: .04em;
+        }
+
+        .logo-text span {
+            color: var(--accent);
+        }
+
+        /* GRAPH CONTAINER */
+        .graph-container {
+            flex: 1;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #large-graph {
+            flex: 1;
+            background: var(--bg);
+        }
+
+        /* CONTROL PANEL */
+        .graph-control {
+            width: 240px;
+            flex-shrink: 0;
+            background: var(--card);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .control-title {
+            font-family: var(--mono);
+            font-size: .65rem;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            padding: .9rem 1.1rem;
+            border-bottom: 1px solid var(--border);
+            background: rgba(0, 212, 170, .05);
+        }
+
+        .control-body {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: .75rem;
+        }
+
+        .selected-node {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: .85rem 1rem;
+            font-family: var(--mono);
+            font-size: .72rem;
+            line-height: 1.9;
+            color: var(--muted);
+        }
+
+        .selected-title {
+            display: block;
+            font-size: .6rem;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: .5rem;
+            padding-bottom: .5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .selected-node span:not(.selected-title) {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .control-button {
+            width: 100%;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            padding: .55rem .9rem;
+            font-family: var(--mono);
+            font-size: .7rem;
+            font-weight: 600;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--muted);
+            cursor: pointer;
+            transition: background .2s, color .2s, border-color .2s;
+            text-align: center;
+            margin-top: .4rem;
+        }
+
+        .control-button:hover {
+            background: rgba(0, 212, 170, .08);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .selected-node .control-button {
+            margin-top: .4rem;
+        }
     </style>
 </head>
 
 <body>
     <div class="noscript" id="noscript">
-            <img src="{{ url_for('static',filename='images/error.png') }}">
-            <h1>ION SecOps Extension Analyzer needs javascript enabled to work!</h1>
+        <img src="{{ url_for('static',filename='images/error.png') }}">
+        <h1 style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#4a6080;">JavaScript required to run
+            ION SecOps Extension Analyzer.</h1>
     </div>
+
     <div class="wrapper">
-        <div id="loading" style="display: block;">
-            <img src="{{ url_for('static',filename='images/working.gif') }}"><br>
-            <h4>Please wait.. plotting graph might take some time!</h4>
+        <div id="loading" style="display:block;">
+            <h4 style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#4a6080;">Plotting graph &mdash;
+                please wait&hellip;</h4>
         </div>
-        <div class="logo-placeholder"><a href='/'><h1 class="logo-text">ION SecOps<br>Extension Analyzer</h1></a></div>
+
+        <div class="logo-placeholder">
+            <a href="/">
+                <h1 class="logo-text">ION <span>SecOps</span><br>Extension Analyzer</h1>
+            </a>
+        </div>
 
         <div class="graph-container" id="container">
             <div id="large-graph"></div>
@@ -79,35 +300,27 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                 <div class="control-title">Controls</div>
                 <div class="control-body">
                     <div class="selected-node" id="selected-node">
-                        <span class="selected-title">SELECTED NODE</span>
-                        ID: <span id="selected-node-id">None</span>
-                        <br>
-                        Name: <span id="selected-node-label">None</span>
-                        <br>
-                        Group: <span id="selected-node-group">None</span>
-                        <br>
-                        Parent: <span id="selected-node-parent">None</span>
-                        <br>
-                        <!--
-                            TODO: add these functions and enable the buttons
-                            <button onclick="hideSelectedGroup()" class="control-button"><i class="fas fa-trash"></i> Delete Group</button>
-                            <button onclick="hideSelectedNode()" class="control-button"><i class="fas fa-trash-alt"></i> Delete Node</button>
-                        -->
+                        <span class="selected-title">Selected Node</span>
+                        ID: <span id="selected-node-id">None</span><br>
+                        Name: <span id="selected-node-label">None</span><br>
+                        Group: <span id="selected-node-group">None</span><br>
+                        Parent: <span id="selected-node-parent">None</span><br>
                         <button onclick="clusterBySelf()" class="control-button">Parent Cluster</button>
                         <button onclick="clusterBySelf(true)" class="control-button">Cluster by Self</button>
                     </div>
-                    <button onclick="resetGraph()" class="control-button"><i class="fas fa-undo"></i> Reset Graph</button>
+                    <button onclick="resetGraph()" class="control-button"><i class="fas fa-undo"></i> Reset
+                        Graph</button>
                 </div>
             </div>
         </div>
-
     </div>
+
     <script type="text/javascript" src="{{ url_for('static',filename='js/jquery.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='js/main.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='js/sweetalert.min.js') }}"></script>
     <script>
         var imagedir = "{{ url_for('static',filename='images/') }}";
-        {{graph_data|safe}}
+        {{ graph_data | safe }}
     </script>
     <script type="text/javascript" src="{{ url_for('static',filename='js/graph.js') }}"></script>
 </body>

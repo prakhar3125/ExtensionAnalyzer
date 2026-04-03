@@ -2,100 +2,352 @@
 <!--
 ExtAnalysis - Browser Extension Analysis Framework
 Copyright (C) 2019 - 2022 Tuhinshubhra
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published
-by the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
+GNU Affero General Public License v3
 -->
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>Source Code from URL | ION SecOps Extension Analyzer</title>
     <link id="pageStyle" rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/style.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bttn.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/secops.css') }}">
-    <link href="{{ url_for('static',filename='images/favicon.png') }}" rel="icon"/>
+    <link href="{{ url_for('static',filename='images/favicon.png') }}" rel="icon" />
     <link rel="stylesheet" href="{{ url_for('static',filename='css/codemirror.css') }}">
     <link rel="stylesheet" href="{{ url_for('static',filename='css/material.css') }}">
     <script type="text/javascript" src="{{ url_for('static',filename='js/fontawesome.min.js') }}"></script>
     <link href="{{ url_for('static',filename='css/fontawesome.min.css') }}" rel="stylesheet" type="text/css" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet">
     <style>
         @font-face {
             font-family: "ocraextended";
-            src: url("{{ url_for('static',filename='fonts/ocraextended.ttf') }}") format('truetype');
+            src:url("{{ url_for('static',filename='fonts/ocraextended.ttf') }}") format('truetype');
             font-weight: 400;
             font-style: normal;
         }
+
         @font-face {
             font-family: "Roboto";
-            src: url("{{ url_for('static',filename='fonts/Roboto-Regular.ttf') }}") format('truetype');
+            src:url("{{ url_for('static',filename='fonts/Roboto-Regular.ttf') }}") format('truetype');
             font-weight: 400;
             font-style: normal;
         }
-        /* Roboto italic */
+
         @font-face {
             font-family: "Roboto";
-            src: url("{{ url_for('static',filename='fonts/Roboto-Italic.ttf') }}") format('truetype');
+            src:url("{{ url_for('static',filename='fonts/Roboto-Italic.ttf') }}") format('truetype');
             font-weight: 400;
             font-style: italic;
         }
-        /* Roboto bold */
+
         @font-face {
             font-family: "Roboto";
-            src: url("{{ url_for('static',filename='fonts/Roboto-Bold.ttf') }}") format('truetype');
+            src:url("{{ url_for('static',filename='fonts/Roboto-Bold.ttf') }}") format('truetype');
             font-weight: 700;
             font-style: normal;
+        }
+
+        @keyframes fadeDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #070b11;
+            --bg2: #0c1220;
+            --card: #0f1929;
+            --border: #1c2e45;
+            --accent: #00d4aa;
+            --accent2: #3b82f6;
+            --warn: #f59e0b;
+            --text: #dde6f0;
+            --muted: #4a6080;
+            --mono: 'JetBrains Mono', monospace;
+            --body: 'DM Sans', sans-serif;
+        }
+
+        html,
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--body);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .noscript {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .noscript img {
+            width: 60px;
+            opacity: .5;
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        /* LOGO BAR */
+        .logo-placeholder {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            padding: .9rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg);
+            flex-shrink: 0;
+        }
+
+        .logo-placeholder::before {
+            content: '';
+            display: block;
+            width: 4px;
+            height: 30px;
+            background: linear-gradient(180deg, var(--accent), var(--accent2));
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .logo-placeholder a {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+        }
+
+        .logo-text {
+            font-family: var(--mono);
+            font-size: .85rem;
+            font-weight: 700;
+            line-height: 1.3;
+            color: var(--text);
+            letter-spacing: .04em;
+        }
+
+        .logo-text span {
+            color: var(--accent);
+        }
+
+        /* MAIN CONTAINER */
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* FILE INFO BAR */
+        .file_info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: .9rem 1.5rem;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            animation: fadeDown .3s ease both;
+            flex-wrap: wrap;
+        }
+
+        .file_image {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1.1rem;
+            color: var(--accent2);
+        }
+
+        .file_image img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+        }
+
+        .file_body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .file_name {
+            font-family: var(--mono);
+            font-size: .78rem;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: .02em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: .35rem;
+        }
+
+        .file_attrs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem 1.25rem;
+        }
+
+        .file_location,
+        .file_type,
+        .file_size {
+            display: flex;
+            align-items: center;
+            gap: .35rem;
+            font-family: var(--mono);
+            font-size: .68rem;
+            color: var(--muted);
+            letter-spacing: .04em;
+        }
+
+        .file_icon {
+            color: var(--accent2);
+        }
+
+        /* TARGET URL BADGE */
+        .url-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            font-family: var(--mono);
+            font-size: .68rem;
+            color: var(--warn);
+            background: rgba(245, 158, 11, .08);
+            border: 1px solid rgba(245, 158, 11, .2);
+            border-radius: 4px;
+            padding: .25rem .6rem;
+            margin-top: .35rem;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* EDITOR */
+        .source_code {
+            display: none;
+        }
+
+        .CodeMirror {
+            flex: 1;
+            height: calc(100vh - 155px);
+            font-family: var(--mono) !important;
+            font-size: .82rem;
+        }
+
+        /* EDITOR BUTTONS BAR */
+        .editor_buttons {
+            display: flex;
+            gap: .5rem;
+            align-items: center;
+            padding: .7rem 1rem;
+            background: var(--bg2);
+            border-top: 1px solid var(--border);
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .format_button {
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            padding: .5rem 1rem;
+            font-family: var(--mono);
+            font-size: .7rem;
+            font-weight: 600;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--muted);
+            cursor: pointer;
+            transition: background .2s, color .2s, border-color .2s;
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+        }
+
+        .format_button:hover {
+            background: rgba(0, 212, 170, .08);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .inline-note {
+            font-family: var(--mono);
+            font-size: .68rem;
+            color: var(--muted);
+            margin-left: auto;
+        }
+
+        .inline-note b {
+            color: var(--accent);
         }
     </style>
 </head>
 
 <body>
     <div class="noscript" id="noscript">
-            <img src="{{ url_for('static',filename='images/error.png') }}">
-            <h1>ION SecOps Extension Analyzer needs javascript enabled to work!</h1>
+        <img src="{{ url_for('static',filename='images/error.png') }}">
+        <h1 style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#4a6080;">JavaScript required to run
+            ION SecOps Extension Analyzer.</h1>
     </div>
+
     <div class="wrapper">
-        <!--
-        <h2 class="logo-text" style="font-size:1.5rem">ION SecOps Extension Analyzer</h2>
-        <h6>Browser Extension Analysis Toolkit!</h6>
-        -->
-        <div class="logo-placeholder"><a href='/'><h1 class="logo-text" style="font-size:1.5rem">ION SecOps Extension Analyzer</h1></a></div>
+        <div class="logo-placeholder">
+            <a href="/">
+                <h1 class="logo-text">ION <span>SecOps</span> Extension Analyzer</h1>
+            </a>
+        </div>
 
         <div class="container" id="container">
             <div class="file_info">
-                <div class="file_image">
-                    {{url_icon | safe}}
-                </div>
+                <div class="file_image">{{url_icon | safe}}</div>
                 <div class="file_body">
-                    <div class="file_name" style="font-size: 14px;letter-spacing: 0.5px;">Target URL: {{target_url}}</div>
-                    <div class="file_attrs">
+                    <div class="file_name">Source Code from URL</div>
+                    <div class="url-badge"><i class="fas fa-link"></i> {{target_url}}</div>
+                    <div class="file_attrs" style="margin-top:.35rem;">
                         <div class="file_location">
-                            <div class="file_icon">
-                                <i class="fas fa-folder"></i>
-                            </div>
-                            ...
+                            <div class="file_icon"><i class="fas fa-folder"></i></div>
+                            &hellip;
                         </div>
                         <div class="file_type">
-                            <div class="file_icon">
-                                <i class="fas fa-file"></i>
-                            </div>
-                             URL
+                            <div class="file_icon"><i class="fas fa-file"></i></div>
+                            URL
                         </div>
                         <div class="file_size">
-                            <div class="file_icon">
-                                <i class="fas fa-weight"></i> 
-                            </div>
-                            ...
+                            <div class="file_icon"><i class="fas fa-weight"></i></div>
+                            &hellip;
                         </div>
                     </div>
                 </div>
@@ -104,14 +356,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
             <textarea class="source_code" id="editor">
                 {{source_code}}
             </textarea>
-            <div class="editor_buttons">
-                    <button class="format_button" onclick="formatSelection()"><i class="fas fa-hat-wizard"></i> Beautify Selected Code</button>
-                    <button class="format_button" onclick="autoFormatSelection()"><i class="fas fa-magic"></i> Beautify Full Code</button>
-            </div>
-            <div class="inline-note">Use the <b>beautify selected code</b> option in case <b>beautify full code</b> breaks layout!</div>
-        </div>
 
+            <div class="editor_buttons">
+                <button class="format_button" onclick="formatSelection()"><i class="fas fa-hat-wizard"></i> Beautify
+                    Selected</button>
+                <button class="format_button" onclick="autoFormatSelection()"><i class="fas fa-magic"></i> Beautify Full
+                    Code</button>
+                <span class="inline-note">Use <b>Beautify Selected</b> if full beautify breaks layout.</span>
+            </div>
+        </div>
     </div>
+
     <script type="text/javascript" src="{{ url_for('static',filename='js/jquery.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='js/main.js') }}"></script>
     <script src="{{ url_for('static',filename='js/codemirror.js') }}"></script>
@@ -123,138 +378,95 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 </body>
 <script>
     code_mode = '{{file_type}}'
-    if (code_mode === 'html'){code_type = 'htmlmixed'} else if (code_mode === 'json'){code_type = 'javascript'} else if (code_mode === 'css'){code_type = 'css'} else {code_type = 'javascript'}
+    if (code_mode === 'html') { code_type = 'htmlmixed' } else if (code_mode === 'json') { code_type = 'javascript' } else if (code_mode === 'css') { code_type = 'css' } else { code_type = 'javascript' }
     var codemirror = CodeMirror.fromTextArea(document.getElementById('editor'), {
         mode: code_type,
         theme: "material",
         lineNumbers: true,
         readOnly: false
     });
-    
+
     function getSelectedRange() {
         return { from: codemirror.getCursor(true), to: codemirror.getCursor(false) };
-      }
+    }
     function autoFormatSelection() {
-        if (code_type === 'javascript'){
+        if (code_type === 'javascript') {
             var currentValue = codemirror.getValue();
             var newval = js_beautify(currentValue);
             codemirror.setValue(newval);
-        } 
+        }
         totalLines = codemirror.lineCount();
-        codemirror.autoFormatRange({line:0, ch:0}, {line:totalLines});
-
+        codemirror.autoFormatRange({ line: 0, ch: 0 }, { line: totalLines });
     }
     function formatSelection() {
         var range = getSelectedRange();
         codemirror.autoFormatRange(range.from, range.to);
     }
-      (function() {
-
+    (function () {
         CodeMirror.extendMode("css", {
-        commentStart: "/*",
-        commentEnd: "*/",
-        newlineAfterToken: function(type, content) {
-            return /^[;{}]$/.test(content);
-        }
+            commentStart: "/*", commentEnd: "*/",
+            newlineAfterToken: function (type, content) { return /^[;{}]$/.test(content); }
         });
-
         CodeMirror.extendMode("javascript", {
-        commentStart: "/*",
-        commentEnd: "*/",
-        // FIXME semicolons inside of for
-        newlineAfterToken: function(type, content, textAfter, state) {
-            if (this.jsonMode) {
-            return /^[\[,{]$/.test(content) || /^}/.test(textAfter);
-            } else {
-            if (content == ";" && state.lexical && state.lexical.type == ")") return false;
-            return /^[;{}]$/.test(content) && !/^;/.test(textAfter);
+            commentStart: "/*", commentEnd: "*/",
+            newlineAfterToken: function (type, content, textAfter, state) {
+                if (this.jsonMode) { return /^[\[,{]$/.test(content) || /^}/.test(textAfter); }
+                else { if (content == ";" && state.lexical && state.lexical.type == ")") return false; return /^[;{}]$/.test(content) && !/^;/.test(textAfter); }
             }
-        }
         });
-
         CodeMirror.extendMode("xml", {
-        commentStart: "<!--",
-        commentEnd: "-->",
-        newlineAfterToken: function(type, content, textAfter) {
-            return type == "tag" && />$/.test(content) || /^</.test(textAfter);
-        }
+            commentStart: "<!--", commentEnd: "-->",
+            newlineAfterToken: function (type, content, textAfter) { return type == "tag" && />$/.test(content) || /^</.test(textAfter); }
         });
-
-        // Comment/uncomment the specified range
         CodeMirror.defineExtension("commentRange", function (isComment, from, to) {
-        var cm = this, curMode = CodeMirror.innerMode(cm.getMode(), cm.getTokenAt(from).state).mode;
-        cm.operation(function() {
-            if (isComment) { // Comment range
-            cm.replaceRange(curMode.commentEnd, to);
-            cm.replaceRange(curMode.commentStart, from);
-            if (from.line == to.line && from.ch == to.ch) // An empty comment inserted - put cursor inside
-                cm.setCursor(from.line, from.ch + curMode.commentStart.length);
-            } else { // Uncomment range
-            var selText = cm.getRange(from, to);
-            var startIndex = selText.indexOf(curMode.commentStart);
-            var endIndex = selText.lastIndexOf(curMode.commentEnd);
-            if (startIndex > -1 && endIndex > -1 && endIndex > startIndex) {
-                // Take string till comment start
-                selText = selText.substr(0, startIndex)
-                // From comment start till comment end
-                + selText.substring(startIndex + curMode.commentStart.length, endIndex)
-                // From comment end till string end
-                + selText.substr(endIndex + curMode.commentEnd.length);
-            }
-            cm.replaceRange(selText, from, to);
-            }
+            var cm = this, curMode = CodeMirror.innerMode(cm.getMode(), cm.getTokenAt(from).state).mode;
+            cm.operation(function () {
+                if (isComment) {
+                    cm.replaceRange(curMode.commentEnd, to);
+                    cm.replaceRange(curMode.commentStart, from);
+                    if (from.line == to.line && from.ch == to.ch)
+                        cm.setCursor(from.line, from.ch + curMode.commentStart.length);
+                } else {
+                    var selText = cm.getRange(from, to);
+                    var startIndex = selText.indexOf(curMode.commentStart);
+                    var endIndex = selText.lastIndexOf(curMode.commentEnd);
+                    if (startIndex > -1 && endIndex > -1 && endIndex > startIndex) {
+                        selText = selText.substr(0, startIndex) + selText.substring(startIndex + curMode.commentStart.length, endIndex) + selText.substr(endIndex + curMode.commentEnd.length);
+                    }
+                    cm.replaceRange(selText, from, to);
+                }
+            });
         });
-        });
-
-        // Applies automatic mode-aware indentation to the specified range
         CodeMirror.defineExtension("autoIndentRange", function (from, to) {
-        var cmInstance = this;
-        this.operation(function () {
-            for (var i = from.line; i <= to.line; i++) {
-            cmInstance.indentLine(i, "smart");
-            }
+            var cmInstance = this;
+            this.operation(function () { for (var i = from.line; i <= to.line; i++) { cmInstance.indentLine(i, "smart"); } });
         });
-        });
-
-        // Applies automatic formatting to the specified range
         CodeMirror.defineExtension("autoFormatRange", function (from, to) {
-        var cm = this;
-        var outer = cm.getMode(), text = cm.getRange(from, to).split("\n");
-        var state = CodeMirror.copyState(outer, cm.getTokenAt(from).state);
-        var tabSize = cm.getOption("tabSize");
-
-        var out = "", lines = 0, atSol = from.ch == 0;
-        function newline() {
-            out += "\n";
-            atSol = true;
-            ++lines;
-        }
-
-        for (var i = 0; i < text.length; ++i) {
-            var stream = new CodeMirror.StringStream(text[i], tabSize);
-            while (!stream.eol()) {
-            var inner = CodeMirror.innerMode(outer, state);
-            var style = outer.token(stream, state), cur = stream.current();
-            stream.start = stream.pos;
-            if (!atSol || /\S/.test(cur)) {
-                out += cur;
-                atSol = false;
+            var cm = this;
+            var outer = cm.getMode(), text = cm.getRange(from, to).split("\n");
+            var state = CodeMirror.copyState(outer, cm.getTokenAt(from).state);
+            var tabSize = cm.getOption("tabSize");
+            var out = "", lines = 0, atSol = from.ch == 0;
+            function newline() { out += "\n"; atSol = true; ++lines; }
+            for (var i = 0; i < text.length; ++i) {
+                var stream = new CodeMirror.StringStream(text[i], tabSize);
+                while (!stream.eol()) {
+                    var inner = CodeMirror.innerMode(outer, state);
+                    var style = outer.token(stream, state), cur = stream.current();
+                    stream.start = stream.pos;
+                    if (!atSol || /\S/.test(cur)) { out += cur; atSol = false; }
+                    if (!atSol && inner.mode.newlineAfterToken && inner.mode.newlineAfterToken(style, cur, stream.string.slice(stream.pos) || text[i + 1] || "", inner.state)) newline();
+                }
+                if (!stream.pos && outer.blankLine) outer.blankLine(state);
+                if (!atSol) newline();
             }
-            if (!atSol && inner.mode.newlineAfterToken &&
-                inner.mode.newlineAfterToken(style, cur, stream.string.slice(stream.pos) || text[i+1] || "", inner.state))
-                newline();
-            }
-            if (!stream.pos && outer.blankLine) outer.blankLine(state);
-            if (!atSol) newline();
-        }
-
-        cm.operation(function () {
-            cm.replaceRange(out, from, to);
-            for (var cur = from.line + 1, end = from.line + lines; cur <= end; ++cur)
-            cm.indentLine(cur, "smart");
-            cm.setSelection(from, cm.getCursor(false));
+            cm.operation(function () {
+                cm.replaceRange(out, from, to);
+                for (var cur = from.line + 1, end = from.line + lines; cur <= end; ++cur) cm.indentLine(cur, "smart");
+                cm.setSelection(from, cm.getCursor(false));
+            });
         });
-        });
-        })();
+    })();
 </script>
+
 </html>

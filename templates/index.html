@@ -2,22 +2,11 @@
 <!--
 ExtAnalysis - Browser Extension Analysis Framework
 Copyright (C) 2019 - 2022 Tuhinshubhra
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published
-by the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>.
+GNU Affero General Public License v3
 -->
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>ION SecOps Extension Analyzer</title>
@@ -25,9 +14,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <link id="pageStyle" rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/style.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bttn.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/hint.min.css') }}">
-    <link href="{{ url_for('static',filename='images/favicon.png') }}" rel="icon"/>
+    <link href="{{ url_for('static',filename='images/favicon.png') }}" rel="icon" />
     <script type="text/javascript" src="{{ url_for('static',filename='js/fontawesome.min.js') }}"></script>
     <link href="{{ url_for('static',filename='css/fontawesome.min.css') }}" rel="stylesheet" type="text/css" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet">
     <style>
         @font-face {
             font-family: "ocraextended";
@@ -35,326 +27,884 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
             font-weight: 400;
             font-style: normal;
         }
+
         @font-face {
             font-family: "Roboto";
             src: url("{{ url_for('static',filename='fonts/Roboto-Regular.ttf') }}") format('truetype');
             font-weight: 400;
             font-style: normal;
         }
-        /* Roboto italic */
+
         @font-face {
             font-family: "Roboto";
             src: url("{{ url_for('static',filename='fonts/Roboto-Italic.ttf') }}") format('truetype');
             font-weight: 400;
             font-style: italic;
         }
-        /* Roboto bold */
+
         @font-face {
             font-family: "Roboto";
             src: url("{{ url_for('static',filename='fonts/Roboto-Bold.ttf') }}") format('truetype');
             font-weight: 700;
             font-style: normal;
         }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #070b11;
+            --bg2: #0c1220;
+            --card: #0f1929;
+            --border: #1c2e45;
+            --accent: #00d4aa;
+            --accent2: #3b82f6;
+            --danger: #ef4444;
+            --warn: #f59e0b;
+            --text: #dde6f0;
+            --muted: #4a6080;
+            --mono: 'JetBrains Mono', monospace;
+            --body: 'DM Sans', sans-serif;
+        }
+
+        html,
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--body);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ─── NOSCRIPT ─── */
+        .noscript {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            font-family: var(--mono);
+        }
+
+        .noscript img {
+            width: 60px;
+            opacity: .5;
+        }
+
+        /* ─── GRID BACKGROUND ─── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-image:
+                linear-gradient(rgba(0, 212, 170, .03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 170, .03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+
+        /* ─── WRAPPER ─── */
+        .wrapper {
+            position: relative;
+            z-index: 1;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        /* ─── LOGO ─── */
+        .logo-placeholder {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo-placeholder::before {
+            content: '';
+            display: block;
+            width: 6px;
+            height: 40px;
+            background: linear-gradient(180deg, var(--accent), var(--accent2));
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .logo-text {
+            font-family: var(--mono);
+            font-size: 1.05rem;
+            font-weight: 700;
+            line-height: 1.3;
+            color: var(--text);
+            letter-spacing: .04em;
+        }
+
+        .logo-text span {
+            color: var(--accent);
+        }
+
+        /* ─── TOP NAV TABS ─── */
+        .tabs {
+            display: flex;
+            gap: .25rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tabs a {
+            font-family: var(--mono);
+            font-size: .75rem;
+            font-weight: 600;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--muted);
+            text-decoration: none;
+            padding: .6rem 1.25rem;
+            border-bottom: 2px solid transparent;
+            transition: color .2s, border-color .2s;
+        }
+
+        .tabs a.active,
+        .tabs a:hover {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .selector {
+            display: none;
+        }
+
+        /* ─── LOADING ─── */
+        #loading {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.25rem;
+            padding: 4rem;
+            color: var(--muted);
+            font-family: var(--mono);
+            font-size: .85rem;
+        }
+
+        #loading img {
+            width: 56px;
+            opacity: .7;
+        }
+
+        /* ─── MODAL ─── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(7, 11, 17, .85);
+            backdrop-filter: blur(4px);
+            z-index: 500;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 520px;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            cursor: pointer;
+            opacity: .6;
+            transition: opacity .2s;
+        }
+
+        .close-modal:hover {
+            opacity: 1;
+        }
+
+        .close-modal svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* ─── SCAN CONTAINER ─── */
+        .scan-container {
+            animation: fadeUp .35s ease both;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ─── INNER TABS ─── */
+        .tabscontainer {
+            width: 100%;
+        }
+
+        ul.result-tabs {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: .25rem;
+            margin-bottom: 1.5rem;
+            padding: 4px;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        ul.result-tabs li {
+            font-family: var(--mono);
+            font-size: .72rem;
+            font-weight: 600;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            color: var(--muted);
+            padding: .55rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background .2s, color .2s;
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+        }
+
+        ul.result-tabs li.current,
+        ul.result-tabs li:hover {
+            background: var(--card);
+            color: var(--accent);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeUp .3s ease both;
+        }
+
+        .tab-content.current {
+            display: block;
+        }
+
+        /* ─── SECTION HEADER ─── */
+        .header_for_sub {
+            font-family: var(--mono);
+            font-size: .8rem;
+            font-weight: 600;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 1rem;
+        }
+
+        /* ─── INPUT + BUTTON ROW ─── */
+        #webstore {
+            display: flex;
+            gap: .75rem;
+            flex-wrap: wrap;
+            margin-top: .5rem;
+        }
+
+        .target_box {
+            flex: 1;
+            min-width: 200px;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: .7rem 1rem;
+            font-family: var(--mono);
+            font-size: .8rem;
+            color: var(--text);
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        .target_box:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 212, 170, .1);
+        }
+
+        .target_box::placeholder {
+            color: var(--muted);
+        }
+
+        .start_scan {
+            background: var(--accent);
+            color: #05110e;
+            font-family: var(--mono);
+            font-size: .75rem;
+            font-weight: 700;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 6px;
+            padding: .7rem 1.4rem;
+            cursor: pointer;
+            transition: opacity .2s, transform .15s;
+            white-space: nowrap;
+        }
+
+        .start_scan:hover {
+            opacity: .88;
+            transform: translateY(-1px);
+        }
+
+        .start_scan:active {
+            transform: translateY(0);
+        }
+
+        /* ─── INLINE NOTE ─── */
+        .inline-note {
+            font-size: .75rem;
+            color: var(--muted);
+            margin-top: .75rem;
+            font-family: var(--mono);
+        }
+
+        .inline-note b {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* ─── BROWSER IMAGE ─── */
+        .tab-content img[style*="margin-bottom"] {
+            height: 52px;
+            width: auto;
+            opacity: .8;
+            margin-top: .5rem;
+        }
+
+        /* ─── PILL CONTAINER (local) ─── */
+        .pill-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .6rem;
+            margin: 1rem 0;
+        }
+
+        .pill {
+            font-family: var(--mono);
+            font-size: .72rem;
+            font-weight: 600;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            padding: .5rem 1.1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: opacity .2s, transform .15s;
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+        }
+
+        .pill:hover {
+            opacity: .85;
+            transform: translateY(-1px);
+        }
+
+        .gchrome {
+            background: #185abc;
+            color: #e8f0fe;
+        }
+
+        .mfirefox {
+            background: #c0622a;
+            color: #fff0e6;
+        }
+
+        .opera {
+            background: #1a3a2a;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+        }
+
+        /* ─── UPLOAD ─── */
+        #upload-extension {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            flex-wrap: wrap;
+            margin-top: .5rem;
+        }
+
+        #upload-form {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .upload-container {
+            width: 100%;
+            background: var(--bg2);
+            border: 1px dashed var(--border);
+            border-radius: 6px;
+            padding: .65rem .9rem;
+            font-family: var(--mono);
+            font-size: .78rem;
+            color: var(--muted);
+            cursor: pointer;
+            transition: border-color .2s;
+        }
+
+        .upload-container:hover {
+            border-color: var(--accent);
+            color: var(--text);
+        }
+
+        /* ─── SETTINGS ─── */
+        .update-container {
+            animation: fadeUp .35s ease both;
+        }
+
+        .header_for_main {
+            font-family: var(--mono);
+            font-size: .75rem;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            padding-bottom: .6rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .option_body {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .option_name {
+            font-family: var(--mono);
+            font-size: .7rem;
+            font-weight: 700;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            padding-bottom: .5rem;
+        }
+
+        .sub-head-settings {
+            font-family: var(--mono);
+            font-size: .75rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: .4rem;
+        }
+
+        .option_description {
+            font-size: .78rem;
+            color: var(--muted);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .option_description a {
+            color: var(--accent2);
+            text-decoration: none;
+        }
+
+        .option_description a:hover {
+            text-decoration: underline;
+        }
+
+        .settings_textbox {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: .65rem 1rem;
+            font-family: var(--mono);
+            font-size: .8rem;
+            color: var(--text);
+            outline: none;
+            width: 100%;
+            max-width: 360px;
+            transition: border-color .2s;
+            margin-bottom: .75rem;
+        }
+
+        .settings_textbox:focus {
+            border-color: var(--accent);
+        }
+
+        /* ─── TOGGLE SWITCH ─── */
+        table {
+            border-collapse: separate;
+            border-spacing: 0 .6rem;
+        }
+
+        table td {
+            font-size: .8rem;
+            color: var(--text);
+            padding: 0 .75rem 0 0;
+            font-family: var(--body);
+            vertical-align: middle;
+        }
+
+        .switch {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .switch-input {
+            display: none;
+        }
+
+        .switch-label {
+            display: inline-block;
+            width: 40px;
+            height: 22px;
+            background: var(--border);
+            border-radius: 11px;
+            cursor: pointer;
+            position: relative;
+            transition: background .25s;
+        }
+
+        .switch-label::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 16px;
+            height: 16px;
+            background: #fff;
+            border-radius: 50%;
+            transition: transform .25s;
+        }
+
+        .switch-input:checked+.switch-label {
+            background: var(--accent);
+        }
+
+        .switch-input:checked+.switch-label::after {
+            transform: translateX(18px);
+        }
+
+        /* ─── HINT ICONS ─── */
+        .hint--bottom:before,
+        .hint--bottom:after {
+            z-index: 100;
+        }
+
+        [class*="hint--"] {
+            color: var(--muted);
+        }
+
+        [class*="hint--"]:hover {
+            color: var(--accent);
+        }
+
+        /* ─── HREFLINK ─── */
+        .hreflink {
+            color: var(--accent2);
+            text-decoration: none;
+        }
+
+        .hreflink:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 
 <body>
     <div class="noscript" id="noscript">
-            <img src="{{ url_for('static',filename='images/error.png') }}">
-            <h1>ION SecOps Extension Analyzer needs javascript enabled to work!</h1>
+        <img src="{{ url_for('static',filename='images/error.png') }}">
+        <h1 style="font-family:var(--mono);font-size:.9rem;color:var(--muted);">JavaScript required to run ION SecOps
+            Extension Analyzer.</h1>
     </div>
+
     <div class="wrapper">
-        <!--
-        <h2>ExtAnalysis</h2>
-        <h6>Browser Extension Analysis Toolkit!</h6>
-        -->
-        <div class="logo-placeholder"><h1 class="logo-text">ION SecOps<br>Extension Analyzer</h1></div>
+        <div class="logo-placeholder">
+            <h1 class="logo-text">ION <span>SecOps</span><br>Extension Analyzer</h1>
+        </div>
+
         <nav class="tabs">
             <div class="selector"></div>
-            <a href="#" class="active" onclick="showscan()"><i class="fas fa-bolt"></i> Analyze</a>
-            <a href="#" onclick="showupdate()"><i class="fas fa-cog"></i> Settings</a>
+            <a href="#" class="active" onclick="showscan()"><i class="fas fa-bolt"></i>&nbsp; Analyze</a>
+            <a href="#" onclick="showupdate()"><i class="fas fa-cog"></i>&nbsp; Settings</a>
         </nav>
 
         <div class="container" id="container">
             <!-- modal -->
-        <div class="modal-overlay">
+            <div class="modal-overlay">
                 <div class="modal">
-    
                     <a class="close-modal">
                         <svg viewBox="0 0 20 20">
-                            <path fill="#ff1424" d="M15.898,4.045c-0.271-0.272-0.713-0.272-0.986,0l-4.71,4.711L5.493,4.045c-0.272-0.272-0.714-0.272-0.986,0s-0.272,0.714,0,0.986l4.709,4.711l-4.71,4.711c-0.272,0.271-0.272,0.713,0,0.986c0.136,0.136,0.314,0.203,0.492,0.203c0.179,0,0.357-0.067,0.493-0.203l4.711-4.711l4.71,4.711c0.137,0.136,0.314,0.203,0.494,0.203c0.178,0,0.355-0.067,0.492-0.203c0.273-0.273,0.273-0.715,0-0.986l-4.711-4.711l4.711-4.711C16.172,4.759,16.172,4.317,15.898,4.045z"></path>
+                            <path fill="#ef4444"
+                                d="M15.898,4.045c-0.271-0.272-0.713-0.272-0.986,0l-4.71,4.711L5.493,4.045c-0.272-0.272-0.714-0.272-0.986,0s-0.272,0.714,0,0.986l4.709,4.711l-4.71,4.711c-0.272,0.271-0.272,0.713,0,0.986c0.136,0.136,0.314,0.203,0.492,0.203c0.179,0,0.357-0.067,0.493-0.203l4.711-4.711l4.71,4.711c0.137,0.136,0.314,0.203,0.494,0.203c0.178,0,0.355-0.067,0.492-0.203c0.273-0.273,0.273-0.715,0-0.986l-4.711-4.711l4.711-4.711C16.172,4.759,16.172,4.317,15.898,4.045z" />
                         </svg>
                     </a>
-                    <!-- close modal -->
-    
                     <div class="modal-content" id="modal-content">
                         <h3>Some content here</h3>
                     </div>
-                    <!-- content -->
-    
                 </div>
-                <!-- modal -->
             </div>
-            <!-- overlay -->  
-                <div id="loading" style="display: none;">
-                        <img src="{{ url_for('static',filename='images/working.gif') }}"><br>
-                        <h4>ION SecOps Extension Analyzer is working... Please wait!</h4>
-                </div>
+
+            <div id="loading" style="display:none;">
+                <h4 style="font-family:var(--mono);font-size:.8rem;color:var(--muted);letter-spacing:.06em;">ION SecOps
+                    Extension Analyzer is working&hellip; Please wait!</h4>
+            </div>
+
             <div class="scan-container" id="scan-container">
                 <div id="select-scan-type">
                     <div class="tabscontainer">
-                <ul class="result-tabs">
-                    <li class="tab-link current" data-tab="tab-0"><i class="fab fa-chrome"></i> Chrome Web Store</li>
-                    <li class="tab-link" data-tab="tab-3"><i class="fab fa-firefox"></i> Firefox Add-ons</li>
-                    <li class="tab-link" data-tab="tab-4"><i class="fab fa-edge"></i> Edge Add-ons</li>
-                    <li class="tab-link" data-tab="tab-1"><i class="fas fa-home"></i> Installed Locally</li>
-                    <li class="tab-link" data-tab="tab-2"><i class="fas fa-upload"></i> Upload Extension</li>
-                </ul>
+                        <ul class="result-tabs">
+                            <li class="tab-link current" data-tab="tab-0"><i class="fab fa-chrome"></i> Chrome Web Store
+                            </li>
+                            <li class="tab-link" data-tab="tab-3"><i class="fab fa-firefox"></i> Firefox Add-ons</li>
+                            <li class="tab-link" data-tab="tab-4"><i class="fab fa-edge"></i> Edge Add-ons</li>
+                            <li class="tab-link" data-tab="tab-2"><i class="fas fa-upload"></i> Upload Extension</li>
+                        </ul>
 
-                <div id="tab-0" class="tab-content current">
-                        <h2 class="header_for_sub">Download and Analyze Google Chrome Extensions</h2>
-                        <img src="{{ url_for('static',filename='images/webstore.png') }}" style="margin-bottom: 10px;">
-                        <!-- h3 id='dl-header'>Enter extension ID or Chrome WebStore link:</h2>
-                        <br>-->
-                        <br>
-                        <div id="webstore">
-                            <input type="text" id="extension-id" class="target_box" placeholder="extension id or chrome webstore url">
-                            <button onclick="download_and_scan()" class="start_scan"><i class="fas fa-binoculars"></i> Download & Analyze </button>
+                        <div id="tab-0" class="tab-content current">
+                            <div class="header_for_sub">Download and Analyze Google Chrome Extensions</div>
+                            <img src="{{ url_for('static',filename='images/webstore.png') }}"
+                                style="margin-bottom:10px;">
+                            <br>
+                            <div id="webstore">
+                                <input type="text" id="extension-id" class="target_box"
+                                    placeholder="extension id or chrome webstore url">
+                                <button onclick="download_and_scan()" class="start_scan"><i
+                                        class="fas fa-binoculars"></i> Download &amp; Analyze</button>
+                            </div>
+                            <div class="inline-note">You can either enter the extension id or the full url of the chrome
+                                webstore.</div>
                         </div>
-                        
-                        <br><br>
-                        <div class="inline-note">You can either enter the extension id or the full url of the chrome webstore.</div>
-                </div>
 
-                <div id="tab-3" class="tab-content">
-                    <h2 class="header_for_sub">Download and Analyze firefox add-ons</h2>
-                    <img src="{{ url_for('static',filename='images/ffaddons.png') }}" style="margin-bottom: 10px;">
-                    <!--<h3 id='dl-header'>Enter firefox add-on link:</h2>
-                    <br>-->
-                    <br>
-                    <div id="webstore">
-                        <input type="text" id="firefox-addon" class="target_box" placeholder="firefox add-on link">
-                        <button onclick="download_and_scan_firefox()" class="start_scan"><i class="fas fa-binoculars"></i> Download & Analyze </button>
-                    </div>
-                    
-                    <br><br>
-                    <div class="inline-note">You can either enter the extension id or the full url of the Firefox Addon listing.</div>
-                </div>
-
-                <div id="tab-4" class="tab-content">
-                    <h2 class="header_for_sub">Download and Analyze Edge add-ons</h2>
-                    <img src="{{ url_for('static',filename='images/edgeaddons.png') }}" style="margin-bottom: 10px;">
-                    <!--<h3 id='dl-header'>Enter Edge add-on link:</h2>
-                    <br>-->
-                    <br>
-                    <div id="webstore">
-                        <input type="text" id="edge-addon" class="target_box" placeholder="edge add-on link">
-                        <button onclick="download_and_scan_edge()" class="start_scan"><i class="fas fa-binoculars"></i> Download & Analyze </button>
-                    </div>
-                    
-                    <br><br>
-                    <div class="inline-note">You can either enter the extension id or the full url of the Edge Addon listing.</div>
-                </div>
-
-                <div id="tab-1" class="tab-content">
-                        <h2 class="header_for_sub">Analyze Local Extensions</h2>
-                        <img src="{{ url_for('static',filename='images/local.png') }}" style="margin-bottom: 10px;">
-                        <br>
-                        <div class="pill-container">
-                            <div class="pill gchrome" onclick="getLocalExtensions('googlechrome')"><i class="fab fa-chrome"></i> Google Chrome</div>
-                            <div class="pill mfirefox" onclick="getLocalExtensions('firefox')"><i class="fab fa-firefox"></i> Mozilla Firefox</div>
-                            <div class="pill opera" onclick="getLocalExtensions('brave')"><i class="fab fa-chrome"></i> Brave Browser</div>
-                            <div class="pill opera" onclick="getLocalExtensions('vivaldi')"><i class="fab fa-chrome"></i> Vivaldi Browser</div>
+                        <div id="tab-3" class="tab-content">
+                            <div class="header_for_sub">Download and Analyze Firefox Add-ons</div>
+                            <img src="{{ url_for('static',filename='images/ffaddons.png') }}"
+                                style="margin-bottom:10px;">
+                            <br>
+                            <div id="webstore">
+                                <input type="text" id="firefox-addon" class="target_box"
+                                    placeholder="firefox add-on link">
+                                <button onclick="download_and_scan_firefox()" class="start_scan"><i
+                                        class="fas fa-binoculars"></i> Download &amp; Analyze</button>
+                            </div>
+                            <div class="inline-note">You can either enter the extension id or the full url of the
+                                Firefox Addon listing.</div>
                         </div>
-                        
-                        <div id="local-list" style="margin-top:5px;"></div>
-                        <div class="inline-note">You can scan the extensions that you already have installed!</div>
-                </div>
 
-                <div id="tab-2" class="tab-content">
-                    <h2 class="header_for_sub">Upload and Analyze</h2>
-                    <img src="{{ url_for('static',filename='images/upload.png') }}" style="margin-bottom: 10px;">
-                   <!-- h3 id='dl-header'><i class="fas fa-upload"></i> Upload .crx files and analyze</h2>-->
-                    <br><br>
-                   <div id="upload-extension">
-                        <form method=post enctype=multipart/form-data action='/upload/' id="upload-form" style="display:inline-block; margin-right:5px; width: 55%;">
-                            <input type=file name=file class="upload-container" id="upload-container">
-                        </form>
-                        <button class="start_scan" onclick="upload_extension()"><i class="fas fa-bolt"></i> Upload & Analyze</button>
+                        <div id="tab-4" class="tab-content">
+                            <div class="header_for_sub">Download and Analyze Edge Add-ons</div>
+                            <img src="{{ url_for('static',filename='images/edgeaddons.png') }}"
+                                style="margin-bottom:10px;">
+                            <br>
+                            <div id="webstore">
+                                <input type="text" id="edge-addon" class="target_box" placeholder="edge add-on link">
+                                <button onclick="download_and_scan_edge()" class="start_scan"><i
+                                        class="fas fa-binoculars"></i> Download &amp; Analyze</button>
+                            </div>
+                            <div class="inline-note">You can either enter the extension id or the full url of the Edge
+                                Addon listing.</div>
+                        </div>
+
+                        <div id="tab-1" class="tab-content">
+                            <div class="header_for_sub">Analyze Local Extensions</div>
+                            <img src="{{ url_for('static',filename='images/local.png') }}" style="margin-bottom:10px;">
+                            <br>
+                            <div class="pill-container">
+                                <div class="pill gchrome" onclick="getLocalExtensions('googlechrome')"><i
+                                        class="fab fa-chrome"></i> Google Chrome</div>
+                                <div class="pill mfirefox" onclick="getLocalExtensions('firefox')"><i
+                                        class="fab fa-firefox"></i> Mozilla Firefox</div>
+                                <div class="pill opera" onclick="getLocalExtensions('brave')"><i
+                                        class="fab fa-chrome"></i> Brave Browser</div>
+                                <div class="pill opera" onclick="getLocalExtensions('vivaldi')"><i
+                                        class="fab fa-chrome"></i> Vivaldi Browser</div>
+                            </div>
+                            <div id="local-list" style="margin-top:5px;"></div>
+                            <div class="inline-note">You can scan extensions that you already have installed!</div>
+                        </div>
+
+                        <div id="tab-2" class="tab-content">
+                            <div class="header_for_sub">Upload and Analyze</div>
+                            <img src="{{ url_for('static',filename='images/upload.png') }}" style="margin-bottom:10px;">
+                            <br><br>
+                            <div id="upload-extension">
+                                <form method="post" enctype="multipart/form-data" action="/upload/" id="upload-form"
+                                    style="display:inline-block;margin-right:5px;width:55%;">
+                                    <input type="file" name="file" class="upload-container" id="upload-container">
+                                </form>
+                                <button class="start_scan" onclick="upload_extension()"><i class="fas fa-bolt"></i>
+                                    Upload &amp; Analyze</button>
+                            </div>
+                            <div class="inline-note">Allowed file extensions: <b>.crx</b>, <b>.xpi</b>, <b>.zip</b>,
+                                <b>.tar</b>, <b>.gzip</b>
+                            </div>
+                        </div>
                     </div>
-                    <br><br>
-                    <div class="inline-note">Allowed file extensions: <b>.crx</b>, <b>.xpi</b>, <b>.zip</b>, <b>.tar</b>, <b>.gzip</b></div>
-                </div>
-                    
-                </div>
                 </div>
             </div>
 
-
+            <!-- SETTINGS -->
             <div class="update-container" id="update-container" style="display:none;">
-                <h2 class="header_for_main">Settings</h2>
+                <h2 class="header_for_main"><i class="fas fa-cog"></i>&nbsp; Settings</h2>
+
                 <div class="option_body">
-                    <div class="option_name" style="color:#03A9F4; border-bottom: dotted 1px #03a9f4">Basic Settings</div>
+                    <div class="option_name" style="color:#3b82f6;border-bottom:1px solid #1e3a5f;">Basic Settings</div>
                     <div class="sub-head-settings">VirusTotal API</div>
-                        <div class="option_description">
-                            Set or change your VirusTotal api here. If you don't have one yet get it here: <a class="hreflink" href="https://www.virustotal.com/gui/join-us" target="_blank">VirusTotal Signup</a>
-                        </div>
-                    <input type="text" id="virustotal_api" class="settings_textbox" placeholder="virustotal api" value="{{virustotal_api}}">
-                    <button class="start_scan" onclick=changeVTapi()><i class="fas fa-check"></i> Apply</button>
+                    <div class="option_description">
+                        Set or change your VirusTotal API key here. No account yet?
+                        <a class="hreflink" href="https://www.virustotal.com/gui/join-us" target="_blank">Sign up on
+                            VirusTotal</a>
+                    </div>
+                    <input type="text" id="virustotal_api" class="settings_textbox" placeholder="virustotal api key"
+                        value="{{virustotal_api}}">
                     <br>
-                    <br>
+                    <button class="start_scan" onclick="changeVTapi()"><i class="fas fa-check"></i> Apply</button>
                 </div>
 
                 <div class="option_body">
-                    <div class="option_name" style="color:#39bb00; border-bottom: dotted 1px #39bb00;">Scan Options</div>
-                    <div class="sub-head-settings">
-                        Intel Extraction Settings
+                    <div class="option_name" style="color:var(--accent);border-bottom:1px solid #0d2e26;">Scan Options
                     </div>
-                    <div class="option_description">
-                        Select what intels you want to be extracted from files.
-                    </div>
+                    <div class="sub-head-settings">Intel Extraction Settings</div>
+                    <div class="option_description">Select what intels you want extracted from extension files.</div>
                     <br>
-                    <table style="border-spacing: 4px 9px;">
+                    <table style="border-spacing:4px 9px;">
                         <tr>
                             <td><i class="fas fa-comment-alt"></i> Comments:</td>
-                            <td><span class="hint--bottom hint--bounce hint--rounded hint--large" aria-label="Set it to false if you want to skip extracting comments from files"><i class="fas fa-question-circle"></i></span></td>
+                            <td><span class="hint--bottom hint--bounce hint--rounded hint--large"
+                                    aria-label="Set it to false if you want to skip extracting comments from files"><i
+                                        class="fas fa-question-circle"></i></span></td>
                             <td>
-                                <div class="switch">
-                                    <input id="extract_comments" type="checkbox" class="switch-input">
-                                    <label for="extract_comments" class="switch-label">Switch</label>
-                                </div>
+                                <div class="switch"><input id="extract_comments" type="checkbox"
+                                        class="switch-input"><label for="extract_comments"
+                                        class="switch-label">Switch</label></div>
                             </td>
                         </tr>
                         <tr>
                             <td><i class="fab fa-btc"></i> BTC address:</td>
-                            <td><span class="hint--bottom hint--bounce hint--rounded hint--large" aria-label="Set this to false if you want to skip extracting bitcoin addresses from files"><i class="fas fa-question-circle"></i></span></td>
+                            <td><span class="hint--bottom hint--bounce hint--rounded hint--large"
+                                    aria-label="Set this to false if you want to skip extracting bitcoin addresses from files"><i
+                                        class="fas fa-question-circle"></i></span></td>
                             <td>
-                                <div class="switch">
-                                    <input id="extract_btc_addresses" type="checkbox" class="switch-input">
-                                    <label for="extract_btc_addresses" class="switch-label">Switch</label>
-                                </div>
+                                <div class="switch"><input id="extract_btc_addresses" type="checkbox"
+                                        class="switch-input"><label for="extract_btc_addresses"
+                                        class="switch-label">Switch</label></div>
                             </td>
                         </tr>
                         <tr>
                             <td><i class="fas fa-key"></i> Base64 strings:</td>
-                            <td><span class="hint--bottom hint--bounce hint--rounded hint--large" aria-label="Set this to false if you want to skip extracting base64 encoded strings from files"><i class="fas fa-question-circle"></i></span></td>
+                            <td><span class="hint--bottom hint--bounce hint--rounded hint--large"
+                                    aria-label="Set this to false if you want to skip extracting base64 encoded strings from files"><i
+                                        class="fas fa-question-circle"></i></span></td>
                             <td>
-                                <div class="switch">
-                                    <input id="extract_base64_strings" type="checkbox" class="switch-input">
-                                    <label for="extract_base64_strings" class="switch-label">Switch</label>
-                                </div>
+                                <div class="switch"><input id="extract_base64_strings" type="checkbox"
+                                        class="switch-input"><label for="extract_base64_strings"
+                                        class="switch-label">Switch</label></div>
                             </td>
                         </tr>
                         <tr>
                             <td><i class="fas fa-at"></i> Email Addresses:</td>
-                            <td><span class="hint--bottom hint--bounce hint--rounded hint--large" aria-label="Set this to false to skip extracting email addresses from files!"><i class="fas fa-question-circle"></i></span></td>
+                            <td><span class="hint--bottom hint--bounce hint--rounded hint--large"
+                                    aria-label="Set this to false to skip extracting email addresses from files!"><i
+                                        class="fas fa-question-circle"></i></span></td>
                             <td>
-                                <div class="switch">
-                                    <input id="extract_email_addresses" type="checkbox" class="switch-input">
-                                    <label for="extract_email_addresses" class="switch-label">Switch</label>
-                                </div>
+                                <div class="switch"><input id="extract_email_addresses" type="checkbox"
+                                        class="switch-input"><label for="extract_email_addresses"
+                                        class="switch-label">Switch</label></div>
                             </td>
                         </tr>
                         <tr>
                             <td><i class="fas fa-map-marker-alt"></i> IPv4 addresses:</td>
-                            <td><span class="hint--bottom hint--bounce hint--rounded hint--large" aria-label="Set this to false if you want to skip extracting IPv4 addresses from files"><i class="fas fa-question-circle"></i></span></td>
+                            <td><span class="hint--bottom hint--bounce hint--rounded hint--large"
+                                    aria-label="Set this to false if you want to skip extracting IPv4 addresses from files"><i
+                                        class="fas fa-question-circle"></i></span></td>
                             <td>
-                                <div class="switch">
-                                    <input id="extract_ipv4_addresses" type="checkbox" class="switch-input">
-                                    <label for="extract_ipv4_addresses" class="switch-label">Switch</label>
-                                </div>
+                                <div class="switch"><input id="extract_ipv4_addresses" type="checkbox"
+                                        class="switch-input"><label for="extract_ipv4_addresses"
+                                        class="switch-label">Switch</label></div>
                             </td>
                         </tr>
                         <tr>
                             <td><i class="fas fa-map-marker-alt"></i> IPv6 addresses:</td>
-                            <td><span class="hint--bottom hint--bounce hint--rounded hint--large" aria-label="set this to false if you want to skip extracting IPv6 addresses from files"><i class="fas fa-question-circle"></i></span></td>
+                            <td><span class="hint--bottom hint--bounce hint--rounded hint--large"
+                                    aria-label="set this to false if you want to skip extracting IPv6 addresses from files"><i
+                                        class="fas fa-question-circle"></i></span></td>
                             <td>
-                                <div class="switch">
-                                    <input id="extract_ipv6_addresses" type="checkbox" class="switch-input">
-                                    <label for="extract_ipv6_addresses" class="switch-label">Switch</label>
-                                </div>
+                                <div class="switch"><input id="extract_ipv6_addresses" type="checkbox"
+                                        class="switch-input"><label for="extract_ipv6_addresses"
+                                        class="switch-label">Switch</label></div>
                             </td>
                         </tr>
                     </table>
                     <br>
-                    <div class="sub-head-settings">
-                        Other Scan Settings
-                    </div>
-                    <div class="option_description">
-                        Miscellaneous scan options! 
-                    </div>
+                    <div class="sub-head-settings">Other Scan Settings</div>
+                    <div class="option_description">Miscellaneous scan options.</div>
                     <br>
-                    <table style="border-spacing: 4px 9px;">
+                    <table style="border-spacing:4px 9px;">
                         <tr>
                             <td><i class="fab fa-css3-alt"></i> Ignore CSS Files:</td>
-                            <td><span class="hint--bottom hint--bounce hint--rounded hint--large" aria-label="Set this to false if you want to analyze css files. Disabled by default as css files contain a lot of junk!"><i class="fas fa-question-circle"></i></span></td>
+                            <td><span class="hint--bottom hint--bounce hint--rounded hint--large"
+                                    aria-label="Set this to false if you want to analyze css files. Disabled by default as css files contain a lot of junk!"><i
+                                        class="fas fa-question-circle"></i></span></td>
                             <td>
-                                <div class="switch">
-                                    <input id="ignore_css" type="checkbox" class="switch-input">
-                                    <label for="ignore_css" class="switch-label">Switch</label>
-                                </div>
+                                <div class="switch"><input id="ignore_css" type="checkbox" class="switch-input"><label
+                                        for="ignore_css" class="switch-label">Switch</label></div>
                             </td>
                         </tr>
                     </table>
-                    <br>
-                    <br>
-                    <button class="start_scan" onclick=updateIntelExtraction()><i class="fas fa-check"></i> Save Settings</button>
+                    <br><br>
+                    <button class="start_scan" onclick="updateIntelExtraction()"><i class="fas fa-check"></i> Save
+                        Settings</button>
                 </div>
-
-                
             </div>
         </div>
-
     </div>
+
     <script type="text/javascript" src="{{ url_for('static',filename='js/jquery.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='js/sweetalert.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='js/main.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='js/datatables.min.js') }}"></script>
     <script>
-        $(document).ready(function(){
-                
-                $('ul.result-tabs li').click(function(){
-                    var tab_id = $(this).attr('data-tab');
-            
-                    $('ul.result-tabs li').removeClass('current');
-                    $('.tab-content').removeClass('current');
-            
-                    $(this).addClass('current');
-                    $("#"+tab_id).addClass('current');
-                });
+        $(document).ready(function () {
+            $('ul.result-tabs li').click(function () {
+                var tab_id = $(this).attr('data-tab');
+                $('ul.result-tabs li').removeClass('current');
+                $('.tab-content').removeClass('current');
+                $(this).addClass('current');
+                $("#" + tab_id).addClass('current');
+            });
 
-                // set the settings value
-                settings = {{settings_json | safe}};
-
-                if (settings['extract_base64_strings'] === true){
-                    $('#extract_base64_strings')[0].checked = true;
-                }
-
-                if (settings['extract_btc_addresses'] === true){
-                    $('#extract_btc_addresses')[0].checked = true;
-                }
-
-                if (settings['extract_comments'] === true){
-                    $('#extract_comments')[0].checked = true;
-                }
-
-                if (settings['extract_email_addresses'] === true){
-                    $('#extract_email_addresses')[0].checked = true;
-                }
-
-                if (settings['extract_ipv4_addresses'] === true){
-                    $('#extract_ipv4_addresses')[0].checked = true;
-                }
-
-                if (settings['extract_ipv6_addresses'] === true){
-                    $('#extract_ipv6_addresses')[0].checked = true;
-                }
-
-                if (settings['ignore_css'] === true){
-                    $('#ignore_css')[0].checked = true;
-                }
-
-            
+            var settings = {{ settings_json | safe
+        }};
+        if (settings['extract_base64_strings'] === true) $('#extract_base64_strings')[0].checked = true;
+        if (settings['extract_btc_addresses'] === true) $('#extract_btc_addresses')[0].checked = true;
+        if (settings['extract_comments'] === true) $('#extract_comments')[0].checked = true;
+        if (settings['extract_email_addresses'] === true) $('#extract_email_addresses')[0].checked = true;
+        if (settings['extract_ipv4_addresses'] === true) $('#extract_ipv4_addresses')[0].checked = true;
+        if (settings['extract_ipv6_addresses'] === true) $('#extract_ipv6_addresses')[0].checked = true;
+        if (settings['ignore_css'] === true) $('#ignore_css')[0].checked = true;
         });
     </script>
 </body>
