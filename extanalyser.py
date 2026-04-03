@@ -154,8 +154,7 @@ def init_settings():
             old_results_dir = settings['old_result_directory']
             if new_results_dir == '':
                 new_results_dir = core.reports_path
-            if old_results_dir == '':
-                old_results_dir = core.reports_path
+            if old_results_dir == '':results_dir = core.reports_path
             ### Check if the results directory have changed... if yes we have to change paths
             if new_results_dir != old_results_dir:
                 core.updatelog('Reports path change detected! fixing old paths and updating report index...')
@@ -3619,6 +3618,10 @@ if 'PORT' in os.environ:
 allowed_extension = set(['crx', 'zip', 'xpi', 'tar', 'gzip'])
 werkzeug_log = logging.getLogger('werkzeug')
 werkzeug_log.setLevel(logging.ERROR)
+
+# Ensure directories exist for Render/Cloud environments
+os.makedirs(helper.fixpath('lab'), exist_ok=True)
+os.makedirs(helper.fixpath('reports'), exist_ok=True)
 
 def run_cli():
     global host, port

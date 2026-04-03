@@ -193,40 +193,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                 </div>
             </div>
 
-            <div class="result-container" id="result-container" style="display:none;">
-                <h2 class="header_for_main">Analysis Reports</h2>
-                <div id="scan-input">
-                    <br>
-                    <button id="load_result" onclick="result()" class="start_scan">Load Reports </button>
-                    <button class="delete_button" onclick=removeAll()><i class="fas fa-trash"></i> Remove All Results</button>
-                    <br>
-                </div>
-                <div class="result-dirs" id="changeme">
-
-                </div>
-                
-            </div>
 
             <div class="update-container" id="update-container" style="display:none;">
                 <h2 class="header_for_main">Settings</h2>
                 <div class="option_body">
                     <div class="option_name" style="color:#03A9F4; border-bottom: dotted 1px #03a9f4">Basic Settings</div>
-                        <div class="sub-head-settings">Reports Directory</div>
-                        <div class="option_description">
-                            Select the location where you wish your Analysis reports should be placed. By default the system uses "reports" directory inside the project directory.
-                        </div>
-                    <input type="text" id="reports_dir" class="settings_textbox" placeholder="~/ExtAnalysis/reports/" value="{{report_dir}}">
-                    <button class="start_scan" onclick=changeReportsDir()><i class="fas fa-check"></i> Apply</button>
-                    <br>
-                    <br>
-                    <div class="sub-head-settings">Lab Directory</div>
-                        <div class="option_description">
-                            Set the location where you wish the system to download extensions for analysis.
-                        </div>
-                    <input type="text" id="lab_dir" class="settings_textbox" placeholder="~/ExtAnalysis/reports/" value="{{lab_dir}}">
-                    <button class="start_scan" onclick=changeLabDir()><i class="fas fa-check"></i> Apply</button>
-                    <br>
-                    <br>
                     <div class="sub-head-settings">VirusTotal API</div>
                         <div class="option_description">
                             Set or change your VirusTotal api here. If you don't have one yet get it here: <a class="hreflink" href="https://www.virustotal.com/gui/join-us" target="_blank">VirusTotal Signup</a>
@@ -333,22 +304,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
                     <button class="start_scan" onclick=updateIntelExtraction()><i class="fas fa-check"></i> Save Settings</button>
                 </div>
 
-                <div class="option_body">
-                    <div class="option_name" style="border-bottom: dotted 1px red;">Delete & Clear</div>
-                    <div class="sub-head-settings">Delete All Reports</div>
-                    <div class="option_description">
-                        Deletes all Analysis directories under the reports directory and clears reports.json file. Essentially deleting all Analysis results.
-                    </div>
-                    <button class="delete_button" onclick=removeAll()><i class="fas fa-trash"></i> Remove All Results</button>
-                    <br>
-                    <br>
-                    <div class="sub-head-settings">Clear Lab Directory</div>
-                    <div class="option_description">
-                        "lab" is the directory where all the extensions are extracted for analysis... clearing it deletes all the contents of the lab directory.
-                        <b>Clearing Lab doesn't effect your results!</b>
-                    </div>
-                    <button class="delete_button" onclick=clearLab()><i class="fas fa-broom"></i> Clear Lab</button>
-                </div>
                 
             </div>
         </div>
