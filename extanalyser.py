@@ -437,7 +437,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 ## all the paths
-path = os.path.dirname(os.path.abspath(__file__)).replace('/core','').replace('\core','')
+path = os.path.dirname(os.path.abspath(__file__)).replace('/core','').replace(r'\core','')
 lab_path = helper.fixpath(path + '/lab')
 reports_path = helper.fixpath(path + '/reports')
 
@@ -586,7 +586,7 @@ def extract_urls(file_path):
     try:
         cnt = open(helper.fixpath(file_path), 'r', encoding='utf8')
         contents = cnt.read()
-        curls = re.findall('(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?', contents)
+        curls = re.findall(r'(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?', contents)
         for url in curls:
             urls.append(url[0]+'://'+url[1]+url[2])
             updatelog('Found url: ' + url[0]+'://'+url[1]+url[2])
@@ -1190,7 +1190,7 @@ def extract(contents, relpath):
     EXTRACT EMAIL IDs FROM JS, HTML, JSON AND CSS FILES
     '''
     if core.extract_email_addresses:
-        cmails = re.findall('([a-zA-Z0-9\.\-_]+(?:@| ?\[(?:at)\] ?)[a-zA-Z0-9\.\-]+(?:\.| ?\[(?:dot)\] ?)[a-zA-Z]+)', contents)
+        cmails = re.findall(r'([a-zA-Z0-9\.\-_]+(?:@| ?\[(?:at)\] ?)[a-zA-Z0-9\.\-]+(?:\.| ?\[(?:dot)\] ?)[a-zA-Z]+)', contents)
         for mail in cmails:
             mail = mail.replace('[at]', '@').replace('[dot]','.')
             core.updatelog('Found email address: ' + mail)
@@ -1234,7 +1234,7 @@ def extract(contents, relpath):
     EXTRACT IPV4 ADDRESSES
     '''
     if core.extract_ipv4_addresses:
-        ipv4s = re.findall('[^a-zA-Z0-9]([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})[^a-zA-Z0-9]', contents)
+        ipv4s = re.findall(r'[^a-zA-Z0-9]([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})[^a-zA-Z0-9]', contents)
         for ipv4 in ipv4s:
             core.updatelog('Found IP v4 Address: ' + ipv4)
             iparr = {"address":ipv4, "file":relpath}
@@ -2415,7 +2415,7 @@ def analyze(ext_name, ext_type='local'):
         for url in urls:
             core.updatelog('Found URL: ' + url['url'])
             domain = re.findall(
-                '^(?:https?:\/\/)?(?:[^@\/\\n]+@)?(?:www\.)?([^:\/?\\n]+)', url['url'])[0]
+                r'^(?:https?:\/\/)?(?:[^@\/\\n]+@)?(?:www\.)?([^:\/?\\n]+)', url['url'])[0]
             url['domain'] = domain
             core.report['urls'].append(url)  # add url to the report file
             domains.append(domain)
@@ -3608,45 +3608,61 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 
-parser = argparse.ArgumentParser(prog='extanalysis.py', add_help=False)
-parser.add_argument('-h', '--host', help='Host to run ExtAnalysis on. Default host is 127.0.0.1')
-parser.add_argument('-p', '--port', help='Port to run ExtAnalysis on. Default port is 13337')
-parser.add_argument('-v', '--version', action='store_true', help='Shows version and quits')
-parser.add_argument('-u', '--update', action='store_true', help='Checks for update')
-parser.add_argument('-q', '--quiet', action='store_true', help='Quiet mode shows only errors on cli!')
-parser.add_argument('-n', '--nobrowser', action='store_true', help='Skips launching a web browser')
-parser.add_argument('--help', action='store_true', help='Shows this help menu and exits')
-args = parser.parse_args()
-
-allowed_extension = set(['crx', 'zip', 'xpi', 'tar', 'gzip'])
-werkzeug_log = logging.getLogger('werkzeug')
-werkzeug_log.setLevel(logging.ERROR)
-
-# Set host and port from environment variables (Required for cloud deployment)
-host = os.environ.get('HOST', args.host if args.host else '127.0.0.1')
-port = int(os.environ.get('PORT', args.port if args.port else 13337))
+# Default values for host and port (Gunicorn-friendly)
+host = os.environ.get('HOST', '127.0.0.1')
+port = int(os.environ.get('PORT', 13337))
 
 # In cloud environments, we must bind to all interfaces
 if 'PORT' in os.environ:
     host = '0.0.0.0'
 
-# enable Quiet mode
-if args.quiet:
-    core.quiet = True
+allowed_extension = set(['crx', 'zip', 'xpi', 'tar', 'gzip'])
+werkzeug_log = logging.getLogger('werkzeug')
+werkzeug_log.setLevel(logging.ERROR)
 
-# help
-if args.help:
-    parser.print_help()
-    parser.exit()
+def run_cli():
+    global host, port
+    parser = argparse.ArgumentParser(prog='extanalysis.py', add_help=False)
+    parser.add_argument('-h', '--host', help='Host to run ExtAnalysis on. Default host is 127.0.0.1')
+    parser.add_argument('-p', '--port', help='Port to run ExtAnalysis on. Default port is 13337')
+    parser.add_argument('-v', '--version', action='store_true', help='Shows version and quits')
+    parser.add_argument('-u', '--update', action='store_true', help='Checks for update')
+    parser.add_argument('-q', '--quiet', action='store_true', help='Quiet mode shows only errors on cli!')
+    parser.add_argument('-n', '--nobrowser', action='store_true', help='Skips launching a web browser')
+    parser.add_argument('--help', action='store_true', help='Shows this help menu and exits')
+    args = parser.parse_args()
 
-# version
-if args.version:
-    # core.print_logo()
-    print('ExtAnalysis Version: ' + core.version)
-    exit()
+    # Set host and port from CLI if provided
+    if args.host is not None:
+        host = args.host
+    if args.port is not None:
+        port = int(args.port)
+        
+    # enable Quiet mode
+    if args.quiet:
+        core.quiet = True
 
-if args.update:
-    check()
+    # help
+    if args.help:
+        parser.print_help()
+        parser.exit()
+
+    # version
+    if args.version:
+        print('ExtAnalysis Version: ' + core.version)
+        exit()
+
+    if args.update:
+        check()
+
+    core.print_logo()
+    settings.init_settings()
+    main_url = 'http://{0}:{1}'.format(host, port)
+    # Skip browser launch in production/cloud environments
+    if args.nobrowser is not True and 'PORT' not in os.environ:
+        webbrowser.open(main_url)
+    print('\n[~] Starting ION SecOps Extension Analyzer at: {0} \n\n'.format(main_url))
+    app.run(host=host, port=port, debug=False)
 
 
 # core.updatelog('Initiating settings...')
@@ -3743,11 +3759,4 @@ def show_analysis(analysis_id):
 
 
 if __name__ == "__main__":
-    core.print_logo()
-    settings.init_settings()
-    main_url = 'http://{0}:{1}'.format(host, port)
-    # Skip browser launch in production/cloud environments
-    if args.nobrowser is not True and 'PORT' not in os.environ:
-        webbrowser.open(main_url)
-    print('\n[~] Starting ION SecOps Extension Analyzer at: {0} \n\n'.format(main_url))
-    app.run(host=host, port=port, debug=False)
+    run_cli()
