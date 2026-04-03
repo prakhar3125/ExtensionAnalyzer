@@ -2282,6 +2282,9 @@ def analyze(ext_name, ext_type='local'):
     else:
         return ('error: [analyze.py] Unsupported input!')
 
+    # Direct Analysis: Purge all old reports before starting new one
+    purge_old_data()
+
     core.updatelog('======== Analysis Begins ========')
     try:
         core.updatelog('Reading manifest.json')
@@ -3623,11 +3626,28 @@ werkzeug_log.setLevel(logging.ERROR)
 os.makedirs(helper.fixpath('lab'), exist_ok=True)
 os.makedirs(helper.fixpath('reports'), exist_ok=True)
 
-# Initialize reports database if missing
+# Initialize reports database if missing or invalid
 reports_json_path = helper.fixpath('reports.json')
 if not os.path.exists(reports_json_path):
     with open(reports_json_path, 'w') as f:
-        f.write('[]')
+        f.write('{"reports": []}')
+
+def purge_old_data():
+    # Helper to ensure only the CURRENT analysis is stored
+    core.updatelog('Purging old data for Direct Analysis mode...')
+    try:
+        if os.path.exists(helper.fixpath('lab')):
+            shutil.rmtree(helper.fixpath('lab'))
+        if os.path.exists(helper.fixpath('reports')):
+            shutil.rmtree(helper.fixpath('reports'))
+        os.makedirs(helper.fixpath('lab'), exist_ok=True)
+        os.makedirs(helper.fixpath('reports'), exist_ok=True)
+        with open(helper.fixpath('reports.json'), 'w') as f:
+            f.write('{"reports": []}')
+        core.reportids = {"reports": []}
+        core.updatelog('Cleanup complete.')
+    except Exception as e:
+        core.updatelog('Cleanup failed: ' + str(e))
 
 def run_cli():
     global host, port
