@@ -3622,16 +3622,13 @@ allowed_extension = set(['crx', 'zip', 'xpi', 'tar', 'gzip'])
 werkzeug_log = logging.getLogger('werkzeug')
 werkzeug_log.setLevel(logging.ERROR)
 
-# Set host and port
-if args.host is not None:
-    host = args.host
-else:
-    host = '127.0.0.1'
+# Set host and port from environment variables (Required for cloud deployment)
+host = os.environ.get('HOST', args.host if args.host else '127.0.0.1')
+port = int(os.environ.get('PORT', args.port if args.port else 13337))
 
-if args.port is not None:
-    port = int(args.port)
-else:
-    port = 13337
+# In cloud environments, we must bind to all interfaces
+if 'PORT' in os.environ:
+    host = '0.0.0.0'
 
 # enable Quiet mode
 if args.quiet:
@@ -3749,7 +3746,8 @@ if __name__ == "__main__":
     core.print_logo()
     settings.init_settings()
     main_url = 'http://{0}:{1}'.format(host, port)
-    if args.nobrowser is not True:
+    # Skip browser launch in production/cloud environments
+    if args.nobrowser is not True and 'PORT' not in os.environ:
         webbrowser.open(main_url)
     print('\n[~] Starting ION SecOps Extension Analyzer at: {0} \n\n'.format(main_url))
     app.run(host=host, port=port, debug=False)
