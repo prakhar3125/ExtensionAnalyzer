@@ -1,0 +1,164 @@
+/* ION SecOps Extension Analyzer - Monolithic Navy Theme */
+:root {
+  --bg-primary: #061637;
+  --bg-secondary: #0a1f4d;
+  --accent: #00d2ff;
+  --text-primary: #ffffff;
+  --text-secondary: #a0b0d0;
+  --success: #00ff88;
+  --error: #ff4d4d;
+  --border: rgba(255, 255, 255, 0.1);
+  --glass: rgba(10, 31, 77, 0.8);
+}
+
+body {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  font-family: 'Roboto', sans-serif !important;
+  margin: 0;
+  padding: 0;
+}
+
+/* Minimalism: Remove all light/dark mode artifacts */
+.dmode, #lightSwitchOn, #lightSwitchOff {
+  display: none !important;
+}
+
+/* Modernized Containers */
+.container, .result-wrapper, .tab-content, .modal {
+  background-color: var(--bg-secondary) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+  border-radius: 12px !important;
+  backdrop-filter: blur(10px);
+}
+
+/* Nav & Tabs */
+.tabs {
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 30px !important;
+  padding: 5px !important;
+}
+
+.tabs a {
+  color: var(--text-secondary) !important;
+  border-radius: 25px !important;
+  transition: all 0.3s ease !important;
+}
+
+.tabs a.active, .tabs a:hover {
+  color: var(--text-primary) !important;
+  background: var(--accent) !important;
+  box-shadow: 0 0 15px rgba(0, 210, 255, 0.3) !important;
+}
+
+.tabs .selector {
+  display: none !important; /* Hide the old animated gradient selector */
+}
+
+/* Input Fields */
+.target_box, .dataTables_filter input {
+  background: rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-primary) !important;
+  border-radius: 8px !important;
+  padding: 12px !important;
+  transition: border-color 0.3s ease !important;
+}
+
+.target_box:focus, .dataTables_filter input:focus {
+  border-color: var(--accent) !important;
+  outline: none !important;
+}
+
+/* Buttons */
+.start_scan, .bttn-success, .bttn-primary {
+  background: var(--accent) !important;
+  color: var(--bg-primary) !important;
+  border: none !important;
+  font-weight: bold !important;
+  letter-spacing: 1px !important;
+  border-radius: 8px !important;
+  padding: 10px 25px !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.start_scan:hover, .bttn-success:hover, .bttn-primary:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 5px 15px rgba(0, 210, 255, 0.4) !important;
+  background: #00e5ff !important;
+}
+
+/* Rebranded Logo Area */
+.logo-text {
+  color: var(--text-primary) !important;
+  letter-spacing: 2px !important;
+  text-transform: uppercase !important;
+  font-weight: 800 !important;
+  margin-bottom: 30px !important;
+}
+
+.logo-text span {
+  color: var(--accent) !important;
+}
+
+/* Tables */
+table.result-table thead th {
+  background: rgba(0, 0, 0, 0.3) !important;
+  color: var(--accent) !important;
+  border-bottom: 2px solid var(--accent) !important;
+}
+
+table.result-table tr:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Permission Badges */
+.permission {
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--accent) !important;
+  color: var(--accent) !important;
+  border-radius: 4px !important;
+}
+
+.permission:hover {
+  background: var(--accent) !important;
+  color: var(--bg-primary) !important;
+}
+
+/* Result Page Overrides */
+#resultnetwork, #large-graph {
+  background: var(--bg-primary) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.mid-head {
+  background: var(--bg-secondary) !important;
+  border-top: 4px solid var(--accent) !important;
+  color: var(--accent) !important;
+}
+
+.sub_body {
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+}
+
+.jsontree_tree {
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+.jsontree_label {
+  color: var(--accent) !important;
+}
+
+.jsontree_value_string {
+  color: var(--text-primary) !important;
+}
+
+.risk-pill.none { background: var(--success) !important; color: #000 !important; }
+.risk-pill.low { background: #8bc34a !important; color: #000 !important; }
+.risk-pill.medium { background: #ffc107 !important; color: #000 !important; }
+.risk-pill.high { background: #ff9800 !important; color: #000 !important; }
+.risk-pill.critical { background: var(--error) !important; color: #fff !important; }

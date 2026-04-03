@@ -22,7 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <meta charset="utf-8">
     <title>{{error_title}} | ION SecOps Extension Analyzer</title>
     <link id="pageStyle" rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/style.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bttn.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/secops.css') }}">
     <link href="{{ url_for('static',filename='images/favicon.png') }}" rel="icon"/>
     <script type="text/javascript" src="{{ url_for('static',filename='js/fontawesome.min.js') }}"></script>
     <link href="{{ url_for('static',filename='css/fontawesome.min.css') }}" rel="stylesheet" type="text/css" />
@@ -75,9 +75,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         <h6>Browser Extension Analysis Toolkit!</h6>
         -->
         <div class="logo-placeholder"><h1 class="logo-text">ION SecOps<br>Extension Analyzer</h1></div>
-        
-        <a href="#" id="lightSwitchOn" onclick="lightsOn()" class="dmode day" title="Enable Light Mode"><img src="{{ url_for('static',filename='images/light.svg') }}" style="width:27px;"></a>
-        <a href="#" id="lightSwitchOff" onclick="lightsOff()" class="dmode night" title="Enable Dark Mode"><img src="{{ url_for('static',filename='images/dark.svg') }}" style="width:27px;"></a>
 
         <div class="container" id="container">
             <div class="error-div">

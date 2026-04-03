@@ -20,14 +20,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 <html>
 <head>
   <title>{{basic_info[0]}} - Analysis Report | ION SecOps Extension Analyzer</title>
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bttn.css') }}">
   <script type="text/javascript" src="{{ url_for('static',filename='js/vis.min.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static',filename='js/fontawesome.min.js') }}"></script>
   <link href="{{ url_for('static',filename='css/vis-network.min.css') }}" rel="stylesheet" type="text/css" />
   <link href="{{ url_for('static',filename='css/fontawesome.min.css') }}" rel="stylesheet" type="text/css" />
   <link href="{{ url_for('static',filename='css/result.css') }}" rel="stylesheet" type="text/css" />
-  <link id="pageStyle" rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/style.css') }}">
-  <link href="{{ url_for('static',filename='images/favicon.png') }}" rel="icon"/>
+    <link id="pageStyle" rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/style.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bttn.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/secops.css') }}">
+    <link href="{{ url_for('static',filename='images/favicon.png') }}" rel="icon"/>
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <style>
     @font-face {
@@ -63,14 +64,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
             <img src="{{ url_for('static',filename='images/error.png') }}">
             <h1>ION SecOps Extension Analyzer needs javascript enabled to work!</h1>
   </div>
-  <div class="logo-placeholder"><a href='/'><h1 class="logo-text">ION SecOps<br>Extension Analyzer</h1></a></div>
-  <a href="#" id="lightSwitchOn" onclick="lightsOn()" class="dmode day" title="Enable Light Mode"><img src="{{ url_for('static',filename='images/light.svg') }}" style="width:27px;"></a>
-  <a href="#" id="lightSwitchOff" onclick="lightsOff()" class="dmode night" title="Enable Dark Mode"><img src="{{ url_for('static',filename='images/dark.svg') }}" style="width:27px;"></a>
-  <div class="result-wrapper">
-      <div id="loading" style="display: block;">
-          <img src="{{ url_for('static',filename='images/working.gif') }}"><br>
-          <h4>ION SecOps Extension Analyzer is working... Please wait!</h4>
-        </div>
+  <div class="logo-placeholder"><a href='/'><h1 class="logo-text" style="font-size:1.5rem">ION SecOps Extension Analyzer</h1></a></div>
     <div class="ext-info-main">
       <!--div class="ext-info-img">
         <span class="risk-span">75</span>
