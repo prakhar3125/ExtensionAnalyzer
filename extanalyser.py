@@ -3623,6 +3623,12 @@ werkzeug_log.setLevel(logging.ERROR)
 os.makedirs(helper.fixpath('lab'), exist_ok=True)
 os.makedirs(helper.fixpath('reports'), exist_ok=True)
 
+# Initialize reports database if missing
+reports_json_path = helper.fixpath('reports.json')
+if not os.path.exists(reports_json_path):
+    with open(reports_json_path, 'w') as f:
+        f.write('[]')
+
 def run_cli():
     global host, port
     parser = argparse.ArgumentParser(prog='extanalysis.py', add_help=False)
