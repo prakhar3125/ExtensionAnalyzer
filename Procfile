@@ -1,1 +1,1 @@
-web: gunicorn extanalyser:app
+web: gunicorn --timeout 600 extanalyser:app
