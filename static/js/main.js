@@ -477,12 +477,12 @@ function getCookie(name) {
 
 function lightsOff() {
   document.cookie = 'lights=off; expires=Fri, 31 Dec 9999 23:59:59 GMT';
-  el.pageStyle?.setAttribute('href', '/static/css/dark.css');
+  el.pageStyle?.setAttribute('href', '/static/css/dark.css?v=2');
 }
 
 function lightsOn() {
   document.cookie = 'lights=on; expires=Fri, 31 Dec 9999 23:59:59 GMT';
-  el.pageStyle?.setAttribute('href', '/static/css/style.css');
+  el.pageStyle?.setAttribute('href', '/static/css/style.css?v=2');
 }
 
 (function checkCookie() {
