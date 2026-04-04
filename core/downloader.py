@@ -141,7 +141,7 @@ class ExtensionDownloader:
 
         return self._download_extension(dl_url, save_name, 'crx')
 
-    def download_firefox(self, url: str) -> Optional[str]:
+    def download_firefox(self, url: str, name: Optional[str] = None) -> Optional[str]:
         """Download Firefox extension."""
         if 'addons.mozilla.org' not in url:
             core.updatelog('Invalid Firefox addon URL')
@@ -153,8 +153,9 @@ class ExtensionDownloader:
             with urllib.request.urlopen(request, context=ssl_context) as response:
                 source_code = response.read().decode('utf-8')
 
+            # More robust regex to find XPI download links
             xpi_matches = re.findall(
-                r'<a class="Button Button--action AMInstallButton-button Button--puffy" href="(.*?).xpi?',
+                r'href="([^"]+?\.xpi(?:\?[^"]*)?)"',
                 source_code
             )
 
@@ -163,16 +164,16 @@ class ExtensionDownloader:
                 return None
 
             xpi_file = f"{xpi_matches[0]}.xpi"
-            name = xpi_file.split('/')[-1]
+            save_name = name if name else xpi_file.split('/')[-1]
 
             core.updatelog(f"Found XPI file: {xpi_file}")
-            return self._download_extension(xpi_file, name, 'xpi')
+            return self._download_extension(xpi_file, save_name, 'xpi')
 
         except Exception as ex:
             core.updatelog(f"Error processing Firefox addon: {str(ex)}")
             return None
 
-    def download_edge(self, url: str) -> Optional[str]:
+    def download_edge(self, url: str, name: Optional[str] = None) -> Optional[str]:
         """Download Microsoft Edge extension."""
         if 'microsoftedge.microsoft.com' not in url:
             core.updatelog('Invalid Edge addon URL')
@@ -188,8 +189,9 @@ class ExtensionDownloader:
                 f"response=redirect&x=id%3D{ext_id}%26installsource%3Dondemand%26uc"
             )
 
+            save_name = name if name else ext_id
             core.updatelog(f"Download URL: {dl_url}")
-            return ext_id if self._download_extension(dl_url, ext_id, "crx") else None
+            return save_name if self._download_extension(dl_url, save_name, "crx") else None
 
         except Exception as e:
             core.updatelog(f'Error downloading Edge extension: {str(e)}')

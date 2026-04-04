@@ -200,9 +200,7 @@ function download_and_scan_firefox() {
     toast('warning', 'Invalid URL', 'Please provide a valid Firefox add-on URL.');
     return;
   }
-  api(`/api/?addonurl=${ext_id}`, 'query=firefoxaddon')
-    .then(handleresponse)
-    .catch(() => { });
+  handle_download(ext_id, 'firefoxaddon');
 }
 
 function download_and_scan_edge() {
@@ -211,20 +209,23 @@ function download_and_scan_edge() {
     toast('warning', 'Invalid URL', 'Please provide a valid Edge add-on URL.');
     return;
   }
-  api(`/api/?addonurl=${ext_id}`, 'query=edgeaddon')
-    .then(handleresponse)
-    .catch(() => { });
+  handle_download(ext_id, 'edgeaddon');
 }
 
-function handle_download(id) {
+function handle_download(id, type = 'dlanalysis') {
   swal({
+    title: 'Download & Analyze Extension',
     text: 'Save extension as (no file extension needed):',
     content: 'input',
     button: { text: 'Download & Analyze', closeModal: false },
   }).then(name => {
     if (!name) throw null;
     showLoading();
-    return api(`/api/?extid=${id}&savedir=${name}`, 'query=dlanalysis', { showLoad: false });
+    let url = `/api/?extid=${id}&savedir=${name}`;
+    if (type === 'firefoxaddon' || type === 'edgeaddon') {
+      url = `/api/?addonurl=${encodeURIComponent(id)}&savedir=${name}`;
+    }
+    return api(url, `query=${type}`, { showLoad: false });
   }).then(text => {
     handleresponse(text);
   }).catch(err => {
