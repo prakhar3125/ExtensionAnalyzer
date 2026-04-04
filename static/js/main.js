@@ -470,22 +470,7 @@ $('.tabs').on('click', 'a', function (e) {
   $(this).addClass('active');
 });
 
-// ─── THEME (COOKIE) ──────────────────────────────────────────────────────────
-function getCookie(name) {
-  return document.cookie.split(';').map(c => c.trim())
-    .find(c => c.startsWith(name + '='))?.split('=')[1] ?? '';
-}
-
-function lightsOff() {
-  document.cookie = 'lights=off; expires=Fri, 31 Dec 9999 23:59:59 GMT';
-  el.pageStyle?.setAttribute('href', '/static/css/dark.css?v=2');
-}
-
-function lightsOn() {
-  document.cookie = 'lights=on; expires=Fri, 31 Dec 9999 23:59:59 GMT';
-  el.pageStyle?.setAttribute('href', '/static/css/style.css?v=2');
-}
-
-(function checkCookie() {
-  getCookie('lights') === 'off' ? lightsOff() : lightsOn();
+// ─── INIT ────────────────────────────────────────────────────────────────────
+(function init() {
+  // Any extra initialization can go here
 })();

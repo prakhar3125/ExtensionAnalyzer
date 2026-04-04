@@ -11,7 +11,8 @@ GNU Affero General Public License v3
     <meta charset="utf-8">
     <title>ION SecOps Extension Analyzer</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link id="pageStyle" rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/style.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/secops.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/style.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bttn.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/hint.min.css') }}">
     <link href="{{ url_for('static',filename='images/favicon.png') }}" rel="icon" />
@@ -882,9 +883,9 @@ GNU Affero General Public License v3
         </div>
     </div>
 
-    <script type="text/javascript" src="{{ url_for('static',filename='js/jquery.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static',filename='js/sweetalert.min.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static',filename='js/main.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='js/jquery.js') }}?v=20260404"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='js/sweetalert.min.js') }}?v=20260404"></script>
+    <script type="text/javascript" src="{{ url_for('static',filename='js/main.js') }}?v=20260404"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='js/datatables.min.js') }}"></script>
     <script>
         $(document).ready(function () {
@@ -896,8 +897,7 @@ GNU Affero General Public License v3
                 $("#" + tab_id).addClass('current');
             });
 
-            var settings = {{ settings_json | safe
-        }};
+            var settings = {{ settings_json | safe }};
         if (settings['extract_base64_strings'] === true) $('#extract_base64_strings')[0].checked = true;
         if (settings['extract_btc_addresses'] === true) $('#extract_btc_addresses')[0].checked = true;
         if (settings['extract_comments'] === true) $('#extract_comments')[0].checked = true;
