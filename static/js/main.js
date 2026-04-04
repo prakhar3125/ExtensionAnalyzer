@@ -213,25 +213,23 @@ function download_and_scan_edge() {
 }
 
 function handle_download(id, type = 'dlanalysis') {
-  swal({
-    title: 'Download & Analyze Extension',
-    text: 'Save extension as (no file extension needed):',
-    content: 'input',
-    button: { text: 'Download & Analyze', closeModal: false },
-  }).then(name => {
-    if (!name) throw null;
-    showLoading();
-    let url = `/api/?extid=${id}&savedir=${name}`;
-    if (type === 'firefoxaddon' || type === 'edgeaddon') {
-      url = `/api/?addonurl=${encodeURIComponent(id)}&savedir=${name}`;
-    }
-    return api(url, `query=${type}`, { showLoad: false });
-  }).then(text => {
-    handleresponse(text);
-  }).catch(err => {
-    if (err) toast('error', 'Download Failed', 'The download request failed.');
-    else { swal.stopLoading(); swal.close(); }
-  });
+  showLoading();
+  // Automatic naming based on ID (sanitized)
+  const safeName = id.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+  
+  let url = `/api/?extid=${id}&savedir=${safeName}`;
+  if (type === 'firefoxaddon' || type === 'edgeaddon') {
+    url = `/api/?addonurl=${encodeURIComponent(id)}&savedir=${safeName}`;
+  }
+  
+  api(url, `query=${type}`, { showLoad: false })
+    .then(text => {
+      handleresponse(text);
+    })
+    .catch(err => {
+      if (err) toast('error', 'Analysis Failed', 'The request failed. Check backend logs.');
+      hideLoading();
+    });
 }
 
 // ─── UPLOAD ──────────────────────────────────────────────────────────────────

@@ -1826,6 +1826,7 @@ class createresult:
         self.edges = 'var edges = new vis.DataSet(['
         self.directory = directory
         self.extension_name = core.report['name']
+        self.visited = set()
         self.list_status = self.list(directory)
 
     def list(self, directory, parent=0):
@@ -1840,9 +1841,19 @@ class createresult:
             self.current_directory_number += 1
 
         if os.path.isdir(directory):
+            # Check for recursion loop
+            abs_path = os.path.abspath(directory)
+            if abs_path in self.visited:
+                return
+            self.visited.add(abs_path)
+            
             # The given path is a directory and we will continue
             # core.updatelog('FUNCTION LIST IS EXECUTING ON: ' + directory)
-            dirlist = os.listdir(directory)
+            try:
+                dirlist = os.listdir(directory)
+            except Exception as e:
+                core.updatelog('Skipping directory due to error: ' + str(e))
+                return
 
             for folder in dirlist:
                 # let's get the path...
@@ -1872,13 +1883,13 @@ class createresult:
                     self.current_file_number += 1
                 # now that we are done with all the files let's go through the sub directories and work them out
 
-            for sub_directory in sub_directories:
+            for sub_directory_data in sub_directories:
                 # process all the sub directories
                 # core.updatelog('Processing SUBDIRECTORY: ' + sub_directory)
-                sub_directory = sub_directory.split(',')
-                sub_parent = sub_directory[1]
-                sub_directory = sub_directory[0]
-                self.list(sub_directory, sub_parent)
+                data = sub_directory_data.split(',')
+                sub_parent_id = data[1]
+                sub_directory_path = data[0]
+                self.list(sub_directory_path, sub_parent_id)
         else:
             # Given path is not a directory hence no need for continuing
             return False

@@ -187,21 +187,30 @@ GNU Affero General Public License v3
             display: none;
         }
 
-        /* ─── LOADING ─── */
         #loading {
             display: none;
             flex-direction: column;
             align-items: center;
-            gap: 1.25rem;
-            padding: 4rem;
+            justify-content: center;
+            gap: 1.5rem;
+            padding: 5rem 2rem;
             color: var(--muted);
             font-family: var(--mono);
             font-size: .85rem;
+            text-align: center;
         }
 
-        #loading img {
-            width: 56px;
-            opacity: .7;
+        .spinner {
+            width: 44px;
+            height: 44px;
+            border: 3px solid rgba(0, 212, 170, 0.1);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         /* ─── MODAL ─── */
@@ -670,8 +679,10 @@ GNU Affero General Public License v3
             </div>
 
             <div id="loading" style="display:none;">
-                <h4 style="font-family:var(--mono);font-size:.8rem;color:var(--muted);letter-spacing:.06em;">ION SecOps
-                    Extension Analyzer is working&hellip; Please wait!</h4>
+                <div class="spinner"></div>
+                <h4 style="font-family:var(--mono);font-size:.8rem;color:var(--muted);letter-spacing:.06em;max-width:300px;line-height:1.6;">
+                    ION SecOps Analyzer is performing deep computation...<br>Please stand by!
+                </h4>
             </div>
 
             <div class="scan-container" id="scan-container">
