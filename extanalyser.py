@@ -644,7 +644,7 @@ def GetNameFromManifest(manifest_file):
                                     locale_content = open(helper.fixpath(locale_dir + '/' + dir + '/messages.json'), 'r', encoding='utf-8')
                                     try:
                                         en_locale_content = json.loads(locale_content.read())
-                                        if manifest_message in locale_content:
+                                        if manifest_message in en_locale_content:
                                             ext_name = en_locale_content[manifest_message]['message']
                                             updatelog('Extension name grabbed from en locale file.. Name: ' + ext_name)
                                             return ext_name
@@ -728,7 +728,7 @@ def GetDescriptionFromManifest(manifest_file):
                                     locale_content = open(helper.fixpath(locale_dir + '/' + dir + '/messages.json'), 'r', encoding="utf8")
                                     try:
                                         en_locale_content = json.loads(locale_content.read())
-                                        if manifest_message in locale_content:
+                                        if manifest_message in en_locale_content:
                                             ext_desc = en_locale_content[manifest_message]['message']
                                             updatelog('Extension description grabbed from ' + dir + ' locale file.. description: ' + ext_desc)
                                             return ext_desc
@@ -990,7 +990,7 @@ class ExtensionDownloader:
                 core.updatelog('Could not find XPI download link')
                 return None
 
-            xpi_file = f"{xpi_matches[0]}.xpi"
+            xpi_file = f"{xpi_matches[0]}"
             save_name = name if name else xpi_file.split('/')[-1]
 
             core.updatelog(f"Found XPI file: {xpi_file}")
@@ -1372,90 +1372,17 @@ pub_vt = []
 virustotal_api = core.virustotal_api
 
 def scan_url(url):
-    # Scan the url
-    global pub_vt
-    virustotal_api = core.virustotal_api
-    if virustotal_api == "":
-        if pub_vt:
-            virustotal_api = random.choice(pub_vt)
-            core.updatelog('Using api: ' + virustotal_api)
-        else:
-            return [False, "VT API keys are exhausted or missing!"]
-    vturl = 'https://www.virustotal.com/vtapi/v2/url/scan'
-    params = {'apikey': virustotal_api, 'url':url}
-    response = requests.post(vturl, data=params)
-    response = response.json()
-    if response['response_code'] == 1:
-        core.updatelog('URL queued for scan! getting report after 10 seconds...')
-        time.sleep(10)
-        newurl = 'https://www.virustotal.com/vtapi/v2/url/report'
-        newparams = {'apikey': virustotal_api, 'resource':url}
-        newresponse = requests.get(newurl, params=newparams)
-        finalresp = newresponse.json()
-        if finalresp['response_code'] == 1:
-            print('{0}/{1} - {2}'.format(finalresp['positives'], finalresp['total'], finalresp['permalink']))
-        else:
-            return [False, 'Reached maximum rate limit for virustotal api! If you are using your own key, please wait a minute and try again']
-    else:
-        return [False, 'Reached maximum rate limit for virustotal api! If you are using your own key, please wait a minute and try again']
+    return [False, "VirusTotal API disabled."]
 
 
 def scan_domain(domain):
-    global pub_vt
-    # get a random virustotal api
-    tvirustotal_api = random.choice(pub_vt)
-    core.updatelog('Using api: ' + tvirustotal_api)
-    try:
-        url = 'https://www.virustotal.com/vtapi/v2/domain/report'
-        params = {'apikey':tvirustotal_api,'domain':domain}
-        response = requests.get(url, params=params)
-        response = response.json()
-        if response['response_code'] == 1:
-            return [True, response]
-        else:
-            return [False, 'Either rate limited or something else went wrong while getting domain report from virustotal']
-    except Exception as e:
-        logging.error(traceback.format_exc())
-        return [False, str(e)]
+    return [False, "VirusTotal API disabled."]
 
 
 def domain_batch_scan(domains):
-    # used only when there is only one virustotal api and the pub_vt list is empty
     batch_result = {}
-    total_domains = len(domains)
-
-    if total_domains > 4:
-        # virustotal has limitation of 4 scans per minute for an api so if the domain count is less then 4 we have nothing to wait
-        gotta_wait = True
-    else:
-        gotta_wait = False
-
-    if core.virustotal_api != "":
-        # Do batch scan
-        for index,domain in enumerate(domains):
-            real_index = index + 1
-            if gotta_wait and real_index%4 == 0:
-                core.updatelog('Sleeping for 1 minute... virustotal api limit reached!')
-                # Sleep for 60 seconds.. I really hate it but it seems there's no other way around other then you adding a bunch of diff apis to the above list
-                core.updatelog("Skipping VT delay. Not hitting API."); pass # time.sleep(60)
-            core.updatelog('Getting virustotal report for: ' + domain)
-            try:
-                url = 'https://www.virustotal.com/vtapi/v2/domain/report'
-                params = {'apikey':core.virustotal_api,'domain':domain}
-                response = requests.get(url, params=params)
-                response = response.json()
-                if response['response_code'] == 1:
-                    batch_result[domain] = [True, response]
-                else:
-                    batch_result[domain] = [False, {"error":"Either rate limited or something else went wrong while getting domain report from virustotal"}]
-            except Exception as e:
-                logging.error(traceback.format_exc())
-                batch_result[domain] = [False, str(e)]
-    else:
-        for _domain in domains:
-            core.updatelog('Skipping virustotal domain scan for {0}. Reason: No virustotal api added!'.format(_domain))
-            batch_result[_domain] = [False, "No virustotal api found"]
-
+    for _domain in domains:
+        batch_result[_domain] = [False, "VirusTotal API disabled."]
     return batch_result
 
 
@@ -1724,7 +1651,7 @@ class GetLocalExtensions():
                 xpi_manifest = os.path.join(extract_directory, 'manifest.json')
                 if os.path.isfile(xpi_manifest):
                     ext_name = core.GetNameFromManifest(xpi_manifest)
-                    if ext_name != False or ext_name != None:
+                    if ext_name and ext_name is not False:
                         # DO shits
                         core.updatelog(xpi_file + ' has the name: ' + ext_name + ' adding it to the list')
                         list_content = open(list_file, 'r', encoding='utf-8')
@@ -1954,7 +1881,7 @@ class createresult:
         for file in self.files:
             if file['type'] == 'json' or file['type'] == 'html' or file['type'] == 'css' or file['type'] == 'js':
                 file_path = file['path']
-                new_path = helper.fixpath(result_directory + '/' + file['name'] + '.src')
+                new_path = helper.fixpath(result_directory + '/' + file['id'] + '_' + file['name'] + '.src')
                 file_name = file['name']
                 if os.path.isfile(file_path):
                     # Checks if file present
@@ -3433,7 +3360,7 @@ def viewresult_view(analysis_id):
                         if file_name.endswith('.js'):
                             # Add button for viewing retirejs vulnerability scan results
                             # okay it's annoying to show button on every js file let's just show where there is vuln.
-                            if source_data[file_id]['retirejs_result'] != []:
+                            if source_data[file_id].get('retirejs_result', []) != []:
                                 file_action += ' <button class="bttn-fill bttn-xs bttn-danger" onclick="retirejsResult({0}, {1}, {2})"><i class="fas fa-spider"></i> Vulnerabilities</button>'.format("'"+file_id+"'", "'"+analysis_id+"'", "'"+file_name+"'")
                         file_type = helper.fixpath(core.path + '/static/images/' + file_name.split('.')[-1] + '1.png')
                         if os.path.isfile(file_type):
@@ -3716,7 +3643,7 @@ def allowed_file(filename):
 
 csrf = CSRFProtect()
 app = Flask('ION SecOps Extension Analyzer')
-app.config['UPLOAD_FOLDER'] = core.lab_path
+core.lab_path = core.lab_path
 app.secret_key = str(os.urandom(24))
 csrf.init_app(app)
 
@@ -3759,10 +3686,10 @@ def upload_file():
             return ('error: Empty File!')
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            file.save(os.path.join(core.lab_path, filename))
             core.updatelog('File Uploaded.. Filename: ' + filename)
             # saveas = filename.split('.')[0]
-            anls = analysis.analyze(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            anls = analysis.analyze(os.path.join(core.lab_path, filename))
             return (anls)
         else:
             return (
@@ -3772,8 +3699,9 @@ def upload_file():
 @app.route("/api/", methods=["POST"])
 def api():
     if request.method == 'POST':
-        # query = request.args.get('query')
-        query = request.form['query']
+        query = request.values.get('query', '')
+        if not query:
+            return 'error: Missing query parameter'
         return api_view(query, request.values)
 
 
