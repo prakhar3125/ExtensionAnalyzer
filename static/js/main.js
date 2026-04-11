@@ -1,6 +1,6 @@
 /**
  * SecOps Extension Analyzer — main.js
- * Based on ExtAnalysis by Tuhinshubhra (AGPL-3.0)
+ * Based on native telemetry logic.
  * Refactored: ES6+, DRY helpers, custom toast system
  */
 

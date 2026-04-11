@@ -62,8 +62,8 @@ _m.saveresult = _m
 # ==========================================
 
 """
-ExtAnalysis - Browser Extension Analysis Framework
-Copyright (C) 2019 - 2022 Tuhinshubhra
+SecOps Extension Analyzer
+
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -92,8 +92,8 @@ def fixpath(path):
 # ==========================================
 
 """
-ExtAnalysis - Browser Extension Analysis Framework
-Copyright (C) 2019 - 2022 Tuhinshubhra
+SecOps Extension Analyzer
+
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -124,7 +124,7 @@ def init_settings():
         core.updatelog('Could not find settings.json file. Downloading it from github...')
         try:
             import urllib.request
-            raw_settings = 'https://raw.githubusercontent.com/Tuhinshubhra/ExtAnalysis/master/settings.json'
+            raw_settings = 'https://raw.githubusercontent.com/local/SecOpsAnalyzer/master/settings.json'
             urllib.request.urlretrieve(raw_settings, core.settings_file)
             core.updatelog('New settings file successfully generated!')
         except Exception as e:
@@ -416,8 +416,8 @@ def update_settings_batch(settings_dict):
 # ==========================================
 
 """
-ExtAnalysis - Browser Extension Analysis Framework
-Copyright (C) 2019 - 2022 Tuhinshubhra
+SecOps Extension Analyzer
+
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -451,9 +451,9 @@ report = {} #'{"name":"","version":"","author":"","permissions":[{"name":"","des
 reportids = {}
 virustotal_api = ''
 ignore_css = True
-github_repo = 'https://github.com/Tuhinshubhra/ExtAnalysis'
-github_zip = 'https://github.com/Tuhinshubhra/ExtAnalysis/archive/master.zip'
-version_url = 'https://raw.githubusercontent.com/Tuhinshubhra/ExtAnalysis/master/current_version'
+github_repo = 'https://github.com/local/SecOpsAnalyzer'
+github_zip = 'https://github.com/local/SecOpsAnalyzer/archive/master.zip'
+version_url = 'https://raw.githubusercontent.com/local/SecOpsAnalyzer/master/current_version'
 
 # settings for intel extraction! DO NOT EDIT HERE! use the settings.json instead
 extract_comments = True
@@ -840,8 +840,8 @@ signal.signal(signal.SIGINT, signal_handler)
 # ==========================================
 
 """
-ExtAnalysis - Browser Extension Analysis Framework
-Copyright (C) 2019 - 2022 Tuhinshubhra
+SecOps Extension Analyzer
+
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -1031,8 +1031,8 @@ class ExtensionDownloader:
 # ==========================================
 
 """
-ExtAnalysis - Browser Extension Analysis Framework
-Copyright (C) 2019 - 2022 Tuhinshubhra
+SecOps Extension Analyzer
+
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -1113,8 +1113,8 @@ def source_code(url):
 # ==========================================
 
 """
-ExtAnalysis - Browser Extension Analysis Framework
-Copyright (C) 2019 - 2022 Tuhinshubhra
+SecOps Extension Analyzer
+
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -1288,8 +1288,8 @@ def extract(contents, relpath):
 # ==========================================
 
 """
-ExtAnalysis - Browser Extension Analysis Framework
-Copyright (C) 2019 - 2022 Tuhinshubhra
+SecOps Extension Analyzer
+
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -1347,8 +1347,8 @@ def get_country(ip):
 # ==========================================
 
 """
-ExtAnalysis - Browser Extension Analysis Framework
-Copyright (C) 2019 - 2022 Tuhinshubhra
+SecOps Extension Analyzer
+
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -1391,8 +1391,8 @@ def domain_batch_scan(domains):
 # ==========================================
 
 """
-ExtAnalysis - Browser Extension Analysis Framework
-Copyright (C) 2019 - 2022 Tuhinshubhra
+SecOps Extension Analyzer
+
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -1715,8 +1715,8 @@ def analyzelocalfirefoxextension(path):
 # ==========================================
 
 """
-ExtAnalysis - Browser Extension Analysis Framework
-Copyright (C) 2019 - 2022 Tuhinshubhra
+SecOps Extension Analyzer
+
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -2059,8 +2059,8 @@ def clearResult(result_id):
 # ==========================================
 
 """
-ExtAnalysis - Browser Extension Analysis Framework
-Copyright (C) 2019 - 2022 Tuhinshubhra
+SecOps Extension Analyzer
+
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -2431,8 +2431,8 @@ def handle_delete(func, path, exc_info):
 # ==========================================
 
 """
-ExtAnalysis - Browser Extension Analysis Framework
-Copyright (C) 2019 - 2022 Tuhinshubhra
+SecOps Extension Analyzer
+
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -2534,8 +2534,8 @@ def update():
 # ==========================================
 
 """
-ExtAnalysis - Browser Extension Analysis Framework
-Copyright (C) 2019 - 2022 Tuhinshubhra
+SecOps Extension Analyzer
+
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -3075,7 +3075,7 @@ def api_view(query, allargs):
                     'Some settings were updated and some were not... Please restart ExtAnalysis for them to take effect!')
             else:
                 return (
-                    'error: Invalid response from "update_settings_batch". please report it here: https://github.com/Tuhinshubhra/ExtAnalysis/issues/new')
+                    'error: Invalid response from "update_settings_batch". please report it here: https://github.com/local/SecOpsAnalyzer/issues/new')
         except:
             logging.error(traceback.format_exc())
             return ('error: Incomplete Request!')
@@ -3089,8 +3089,8 @@ def api_view(query, allargs):
 # ==========================================
 
 """
-ExtAnalysis - Browser Extension Analysis Framework
-Copyright (C) 2019 - 2022 Tuhinshubhra
+SecOps Extension Analyzer
+
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -3165,8 +3165,8 @@ def viewfile_view(analysis_id, file_id):
 # ==========================================
 
 """
-ExtAnalysis - Browser Extension Analysis Framework
-Copyright (C) 2019 - 2022 Tuhinshubhra
+SecOps Extension Analyzer
+
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -3212,8 +3212,8 @@ def viewgraph_view(analysis_id):
 # ==========================================
 
 """
-ExtAnalysis - Browser Extension Analysis Framework
-Copyright (C) 2019 - 2022 Tuhinshubhra
+SecOps Extension Analyzer
+
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -3484,8 +3484,8 @@ def viewresult_view(analysis_id):
 # ==========================================
 
 """
-ExtAnalysis - Browser Extension Analysis Framework
-Copyright (C) 2019 - 2022 Tuhinshubhra
+SecOps Extension Analyzer
+
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published
@@ -3533,8 +3533,8 @@ def viewsource_view(url):
 # -*- coding: utf-8 -*-
 
 """
-ExtAnalysis - Browser Extension Analysis Framework
-Copyright (C) 2019 - 2022 Tuhinshubhra
+SecOps Extension Analyzer
+
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published

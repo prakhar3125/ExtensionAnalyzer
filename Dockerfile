@@ -5,7 +5,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 FROM python:3.11-slim
 LABEL name="ExtAnalysis"
-LABEL creator="Tuhinshubhra"
+LABEL creator="SecOps"
 LABEL desc="Browser Extension Analysis Framework"
 
 # Create a non-root user for security
