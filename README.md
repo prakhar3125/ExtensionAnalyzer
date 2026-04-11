@@ -31,7 +31,7 @@ pip install -r requirements.txt
 
 ## Running the Analyzer
 
-To start the analyzer natively, simply run the Python monolith script:
+To start the analyzer natively, simply run the Python script:
 
 ```bash
 python extanalyser.py
