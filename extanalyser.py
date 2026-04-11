@@ -154,7 +154,8 @@ def init_settings():
             old_results_dir = settings['old_result_directory']
             if new_results_dir == '':
                 new_results_dir = core.reports_path
-            if old_results_dir == '':results_dir = core.reports_path
+            if old_results_dir == '':
+                old_results_dir = core.reports_path
             ### Check if the results directory have changed... if yes we have to change paths
             if new_results_dir != old_results_dir:
                 core.updatelog('Reports path change detected! fixing old paths and updating report index...')
@@ -241,8 +242,8 @@ def path_changed(old_path, new_path):
     # Change '<reports_path>' to absolute path in results file
 
     if core.reportids == {}:
-        ri = open(core.report_index, 'r', encoding='utf-8')
-        ri = ri.read()
+        with open(core.report_index, 'r', encoding='utf-8') as f:
+            ri = f.read()
         core.reportids = json.loads(ri)
     reports = core.reportids
     for report in reports['reports']:
@@ -251,17 +252,15 @@ def path_changed(old_path, new_path):
             report['report_directory'] = report['report_directory'].replace('<reports_path>', old_path)
     
     core.reportids = reports
-    ri = open(core.report_index, 'w+', encoding='utf-8')
-    ri.write(json.dumps(reports, indent=4, sort_keys=True))
-    ri.close()
+    with open(core.report_index, 'w', encoding='utf-8') as f:
+        f.write(json.dumps(reports, indent=4, sort_keys=True))
     core.updatelog('Report index updated successfully')
     core.updatelog('Updating settings.json')
-    sj = open(core.settings_file, 'r', encoding='utf-8')
-    sj = json.loads(sj.read())
+    with open(core.settings_file, 'r', encoding='utf-8') as f:
+        sj = json.loads(f.read())
     sj['old_result_directory'] = new_path
-    wsj = open(core.settings_file, 'w+', encoding='utf-8')
-    wsj.write(json.dumps(sj, indent=4, sort_keys=False))
-    wsj.close()
+    with open(core.settings_file, 'w', encoding='utf-8') as f:
+        f.write(json.dumps(sj, indent=4, sort_keys=False))
     core.updatelog('Updated settings.json successfully')
 
 def changedir(newpath):
@@ -470,16 +469,7 @@ log_file = helper.fixpath(path + '/extanalysis.log')
 
 
 def print_logo():
-    logo = '''
-     _____     _   _____         _         _
-    |   __|_ _| |_|  _  |___ ___| |_ _ ___|_|___
-    |   __|_'_|  _|     |   | .'| | | |_ -| |_ -|
-    |_____|_,_|_| |__|__|_|_|__,|_|_  |___|_|___|
-    => Browser Extension Analysis |___| Framework
-    => Version {0} By r3dhax0r
-
-    '''.format(version)
-    print(logo)
+    pass
 
 def updatelog(clog, type='info'):
     '''
@@ -1345,8 +1335,8 @@ def get_country(ip):
         core.updatelog('To save time in future analysis; install maxminddb by: pip3 install maxminddb')
         gip = geoip(ip)
         if gip[0]:
-           geoip = gip[1]
-           return [True, geoip['country'].lower(), geoip['country_name']] 
+           geoip_data = gip[1]
+           return [True, geoip_data['country'].lower(), geoip_data['country_name']] 
         else:
             return [False, gip[1]]
 
@@ -1383,11 +1373,14 @@ virustotal_api = core.virustotal_api
 
 def scan_url(url):
     # Scan the url
-    global pub_vt, virustotal_api
+    global pub_vt
+    virustotal_api = core.virustotal_api
     if virustotal_api == "":
-        # get a random virustotal api
-        virustotal_api = random.choice(pub_vt)
-        core.updatelog('Using api: ' + virustotal_api)
+        if pub_vt:
+            virustotal_api = random.choice(pub_vt)
+            core.updatelog('Using api: ' + virustotal_api)
+        else:
+            return [False, "VT API keys are exhausted or missing!"]
     vturl = 'https://www.virustotal.com/vtapi/v2/url/scan'
     params = {'apikey': virustotal_api, 'url':url}
     response = requests.post(vturl, data=params)
@@ -1444,7 +1437,7 @@ def domain_batch_scan(domains):
             if gotta_wait and real_index%4 == 0:
                 core.updatelog('Sleeping for 1 minute... virustotal api limit reached!')
                 # Sleep for 60 seconds.. I really hate it but it seems there's no other way around other then you adding a bunch of diff apis to the above list
-                time.sleep(60)
+                core.updatelog("Skipping VT delay. Not hitting API."); pass # time.sleep(60)
             core.updatelog('Getting virustotal report for: ' + domain)
             try:
                 url = 'https://www.virustotal.com/vtapi/v2/domain/report'
@@ -1612,8 +1605,8 @@ class GetLocalExtensions():
                 if os.path.isfile(firefox_profile):
                     # found firefox profiles.ini
                     try:
-                        firefox_config = configparser.SafeConfigParser()
-                        with open(firefox_profile, 'rU') as ini_source:
+                        firefox_config = configparser.ConfigParser()
+                        with open(firefox_profile, 'r') as ini_source:
                             firefox_config.readfp(ini_source)
                         default_profile_path = os.path.normpath(os.path.join(firefox_directory, firefox_config.get('Profile0', 'Path')))
                         core.updatelog('Found firefox profile path: ' + default_profile_path)
@@ -1636,8 +1629,8 @@ class GetLocalExtensions():
                 if os.path.isfile(firefox_profile):
                     # found firefox profiles.ini
                     try:
-                        firefox_config = configparser.SafeConfigParser()
-                        with open(firefox_profile, 'rU') as ini_source:
+                        firefox_config = configparser.ConfigParser()
+                        with open(firefox_profile, 'r') as ini_source:
                             firefox_config.readfp(ini_source)
                         default_profile_path = os.path.normpath(os.path.join(firefox_directory, firefox_config.get('Profile0', 'Path')))
                         core.updatelog('Found firefox profile path: ' + default_profile_path)
@@ -1886,7 +1879,7 @@ class createresult:
             for sub_directory_data in sub_directories:
                 # process all the sub directories
                 # core.updatelog('Processing SUBDIRECTORY: ' + sub_directory)
-                data = sub_directory_data.split(',')
+                data = sub_directory_data.rsplit(',', 1)
                 sub_parent_id = data[1]
                 sub_directory_path = data[0]
                 self.list(sub_directory_path, sub_parent_id)
@@ -2060,9 +2053,9 @@ def clearAllResults():
     all_reports = core.reportids
     report_index = core.report_index
     if all_reports == {}:
-        ri = open(report_index, 'r')
-        ri = ri.read()
-        all_reports = core.report_index = json.loads(ri)
+        with open(report_index, 'r') as f:
+            ri = f.read()
+        all_reports = core.reportids = json.loads(ri)
     for report in all_reports['reports']:
         core.updatelog('Deleting analysis #{0} - {1}'.format(report['id'], report['name']))
         report_dir = report['report_directory'].replace('<reports_path>', core.reports_path)
@@ -2299,8 +2292,8 @@ def analyze(ext_name, ext_type='local'):
     try:
         core.updatelog('Reading manifest.json')
         manifest_file = helper.fixpath(extract_dir + '/manifest.json')
-        manifest_load = open(manifest_file, 'r', encoding='utf-8')
-        manifest_content = manifest_load.read()
+        with open(manifest_file, 'r', encoding='utf-8') as manifest_load:
+            manifest_content = manifest_load.read()
         manifest_content = json.loads(manifest_content)
         rinit = core.initreport(manifest_content, extract_dir, ext_type)
         if not rinit:
@@ -2312,8 +2305,8 @@ def analyze(ext_name, ext_type='local'):
         ##### PERMISSION CHECKS AND OTHER STUFFS RELATED TO PERMISSIONS #####
         #####################################################################
         perm_file = helper.fixpath(core.path + '/db/permissions.json')
-        perms = open(perm_file, 'r', encoding='utf-8')
-        perms = perms.read()
+        with open(perm_file, 'r', encoding='utf-8') as f:
+            perms = f.read()
         perms = json.loads(perms)
         try:
             for permission in manifest_content['permissions']:
@@ -3371,7 +3364,8 @@ def viewresult_view(analysis_id):
                                     extjs_table += '<tr><td>' + aurl_href + '</td>'
                                     b64url = "'" + base64.b64encode(aurl['url'].encode('ascii', 'ignore')).decode('ascii') + "'"
                                     extjs_table += '<td>{0}</td><td>{1}</td>'.format(aurl['domain'], aurl['file'])
-                                    extjs_table += '<td><button class="bttn-fill bttn-xs bttn-primary" onclick=whois(\'{1}\')><i class="fab fa-searchengin"></i> WHOIS</button> <button class="bttn-fill bttn-xs bttn-success" onclick="getSource({0})"><i class="fas fa-code"></i> Source</button> <button class="bttn-fill bttn-xs bttn-danger" onclick="getHTTPHeaders({0})"><i class="fas fa-stream"></i> HTTP Headers</button></td></tr>'.format(b64url, aurl['url'])
+                                    vt_extjs_url = 'https://www.virustotal.com/gui/search/' + aurl['url']
+                                    extjs_table += '<td><button class="bttn-fill bttn-xs bttn-primary" onclick=whois(\'{1}\')><i class="fab fa-searchengin"></i> WHOIS</button> <button class="bttn-fill bttn-xs bttn-success" onclick="getSource({0})"><i class="fas fa-code"></i> Source</button> <button class="bttn-fill bttn-xs bttn-danger" onclick="getHTTPHeaders({0})"><i class="fas fa-stream"></i> HTTP Headers</button> <a class="bttn-fill bttn-xs bttn-warning" href="' + vt_extjs_url + '" target="_blank"><i class="fas fa-shield-alt"></i> VT</a></td></tr>'.format(b64url, aurl['url'])
                                     extjs_count += 1
                             else:
                                 if aurl['url'] not in done_urls:
@@ -3380,7 +3374,8 @@ def viewresult_view(analysis_id):
                                     urls_table += '<tr><td>' + aurl_href + '</td>'
                                     urls_table += '<td>{0}</td><td>{1}</td>'.format(aurl['domain'], aurl['file'])
                                     b64url = "'" + base64.b64encode(aurl['url'].encode('ascii', 'ignore')).decode('ascii') + "'"
-                                    urls_table += '<td><button class="bttn-fill bttn-xs bttn-primary" onclick=whois(\'{1}\')><i class="fab fa-searchengin"></i> WHOIS</button> <button class="bttn-fill bttn-xs bttn-success" onclick="getSource({0})"><i class="fas fa-code"></i> Source</button> <button class="bttn-fill bttn-xs bttn-danger" onclick="getHTTPHeaders({0})"><i class="fas fa-stream"></i> HTTP Headers</button></td></tr>'.format(b64url, aurl['url'])
+                                    vt_url_url = 'https://www.virustotal.com/gui/search/' + aurl['url']
+                                    urls_table += '<td><button class="bttn-fill bttn-xs bttn-primary" onclick=whois(\'{1}\')><i class="fab fa-searchengin"></i> WHOIS</button> <button class="bttn-fill bttn-xs bttn-success" onclick="getSource({0})"><i class="fas fa-code"></i> Source</button> <button class="bttn-fill bttn-xs bttn-danger" onclick="getHTTPHeaders({0})"><i class="fas fa-stream"></i> HTTP Headers</button> <a class="bttn-fill bttn-xs bttn-warning" href="' + vt_url_url + '" target="_blank"><i class="fas fa-shield-alt"></i> VT</a></td></tr>'.format(b64url, aurl['url'])
                                     urls_count += 1
 
                         if done_urls != []:
@@ -3408,7 +3403,9 @@ def viewresult_view(analysis_id):
                             else:
                                 flag_path = url_for('static',filename='images/flags/unknown.png')
                             country_html = '<img src="{0}" class="country_flag"> {1}'.format(flag_path, domain['country'])
-                            domains_table += '<tr><td>{4}</td><td>{0}</td><td>{2}</td><!-- td>{1}</td --><td><button class="bttn-fill bttn-xs bttn-danger" onclick=whois("{0}")><i class="fab fa-searchengin"></i> WHOIS</button> <button class="bttn-fill bttn-xs bttn-primary" onclick="domainvt(\'{0}\', \'{3}\')"><i class="fas fa-hourglass-end"></i> VT Report</button> <button class="bttn-fill bttn-xs bttn-success" onclick=geoip("{2}")><i class="fas fa-globe-americas"></i> Geo-IP Lookup</button></td></tr>'.format(domain['name'], '0/66', domain['ip'], analysis_id, country_html)
+                            vt_domain_url = 'https://www.virustotal.com/gui/domain/{0}'.format(domain['name'])
+                            vt_ip_url = 'https://www.virustotal.com/gui/ip-address/{0}'.format(domain['ip'])
+                            domains_table += '<tr><td>{4}</td><td>{0}</td><td>{2}</td><td><button class="bttn-fill bttn-xs bttn-danger" onclick=whois("{0}")><i class="fab fa-searchengin"></i> WHOIS</button> <a class="bttn-fill bttn-xs bttn-primary" href="{5}" target="_blank"><i class="fas fa-shield-alt"></i> VT Domain</a> <a class="bttn-fill bttn-xs bttn-warning" href="{6}" target="_blank"><i class="fas fa-network-wired"></i> VT IP</a> <button class="bttn-fill bttn-xs bttn-success" onclick=geoip("{2}")><i class="fas fa-globe-americas"></i> Geo-IP</button></td></tr>'.format(domain['name'], '', domain['ip'], analysis_id, country_html, vt_domain_url, vt_ip_url)
                         domains_table += '</tbody></table>'
                     else:
                         domains_table = '<h3 class="nothing"> No Domains Extracted! </h3>'
@@ -3454,11 +3451,13 @@ def viewresult_view(analysis_id):
                     if report_data['ipv4_addresses'] == [] and report_data['ipv6_addresses'] == []:
                         ips_table = '<h3 class="nothing">No IPv4 or IPv6 addresses found!</h3>'
                     else:
-                        ips_table = '<table class="result-table" id="ips_table"><thead><tr><th>IP Address</th><th>Type</th><th>File</th></tr></thead><tbody>'
+                        ips_table = '<table class="result-table" id="ips_table"><thead><tr><th>IP Address</th><th>Type</th><th>File</th><th>VirusTotal</th></tr></thead><tbody>'
                         for ip in report_data['ipv4_addresses']:
-                            ips_table += '<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>'.format(ip['address'], 'IPv4', ip['file'])
+                            vt_url = 'https://www.virustotal.com/gui/ip-address/{0}'.format(ip['address'])
+                            ips_table += '<tr><td>{0}</td><td>{1}</td><td>{2}</td><td><a class="bttn-fill bttn-xs bttn-primary" href="{3}" target="_blank"><i class="fas fa-shield-alt"></i> VT Search</a></td></tr>'.format(ip['address'], 'IPv4', ip['file'], vt_url)
                         for ip in report_data['ipv6_addresses']:
-                            ips_table += '<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>'.format(ip['address'], 'IPv6', ip['file'])
+                            vt_url = 'https://www.virustotal.com/gui/search/{0}'.format(ip['address'])
+                            ips_table += '<tr><td>{0}</td><td>{1}</td><td>{2}</td><td><a class="bttn-fill bttn-xs bttn-primary" href="{3}" target="_blank"><i class="fas fa-shield-alt"></i> VT Search</a></td></tr>'.format(ip['address'], 'IPv6', ip['file'], vt_url)
                         ips_table += '</tbody></table>'
 
 
@@ -3705,7 +3704,7 @@ def run_cli():
     # Skip browser launch in production/cloud environments
     if args.nobrowser is not True and 'PORT' not in os.environ:
         webbrowser.open(main_url)
-    print('\n[~] Starting ION SecOps Extension Analyzer at: {0} \n\n'.format(main_url))
+    print('\n[~] Starting SecOps Extension Analyzer at: {0} \n\n'.format(main_url))
     app.run(host=host, port=port, debug=False)
 
 
@@ -3751,8 +3750,8 @@ def home():
 
 @app.route('/upload/', methods=['GET', 'POST'])
 def upload_file():
-    purge_old_data()
     if request.method == 'POST':
+        purge_old_data()
         if 'file' not in request.files:
             return ('error: No File uploaded')
         file = request.files['file']
@@ -3763,7 +3762,7 @@ def upload_file():
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             core.updatelog('File Uploaded.. Filename: ' + filename)
             # saveas = filename.split('.')[0]
-            anls = analysis.analyze(filename)
+            anls = analysis.analyze(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             return (anls)
         else:
             return (
@@ -3775,7 +3774,7 @@ def api():
     if request.method == 'POST':
         # query = request.args.get('query')
         query = request.form['query']
-        return api_view(query, request.args)
+        return api_view(query, request.values)
 
 
 @app.route("/log/")
@@ -3801,6 +3800,292 @@ def route_source_code(url):
 @app.route('/analysis/<analysis_id>')
 def show_analysis(analysis_id):
     return viewresult_view(analysis_id)
+
+
+# ==========================================
+# EXPORT ROUTE
+# ==========================================
+
+def _build_export_html(analysis_id, report_data, source_data):
+    """
+    Builds a fully self-contained, offline HTML report string.
+    No CDN calls — all styles are inline.
+    """
+    now         = time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime())
+    ext_name    = helper.escape(report_data.get('name', 'Unknown'))
+    ext_version = helper.escape(report_data.get('version', '?'))
+    ext_author  = helper.escape(report_data.get('author', 'unknown'))
+    ext_desc    = helper.escape(report_data.get('description', ''))
+    ext_type    = helper.escape(report_data.get('type', ''))
+
+    perm_count    = len(report_data.get('permissions', []))
+    url_count     = len(report_data.get('urls', []))
+    domain_count  = len(report_data.get('domains', []))
+    ip_count      = len(report_data.get('ipv4_addresses', [])) + len(report_data.get('ipv6_addresses', []))
+    email_count   = len(report_data.get('emails', []))
+    btc_count     = len(report_data.get('bitcoin_addresses', []))
+    b64_count     = len(report_data.get('base64_strings', []))
+    comment_count = len(report_data.get('comments', []))
+
+    def trow(*cells):
+        return '<tr>' + ''.join(f'<td>{c}</td>' for c in cells) + '</tr>'
+
+    def section(title, content, count=None):
+        badge = f' <span class="badge">{count}</span>' if count is not None else ''
+        return f'''
+        <details open>
+          <summary>{title}{badge}</summary>
+          <div class="section-body">{content}</div>
+        </details>'''
+
+    def table(headers, rows, empty_msg='No data found.'):
+        if not rows:
+            return f'<p class="empty">{empty_msg}</p>'
+        ths = ''.join(f'<th>{h}</th>' for h in headers)
+        trs = ''.join(rows)
+        return f'<table><thead><tr>{ths}</tr></thead><tbody>{trs}</tbody></table>'
+
+    # Permissions
+    perm_rows = []
+    for p in report_data.get('permissions', []):
+        risk  = helper.escape(p.get('risk', 'none'))
+        name  = helper.escape(p.get('name', ''))
+        desc  = helper.escape(str(p.get('description', 'n/a')))
+        warn  = p.get('warning', 'n/a')
+        warn_html = f'<span class="warn">&#9888; {helper.escape(str(warn))}</span>' if warn and warn != 'n/a' else ''
+        perm_rows.append(trow(
+            f'<span class="risk risk-{risk}">{risk}</span>',
+            f'<code>{name}</code>', desc, warn_html
+        ))
+    perms_html = table(['Risk', 'Permission', 'Description', 'Warning'], perm_rows)
+
+    # URLs
+    url_rows = []
+    for u in report_data.get('urls', []):
+        url  = helper.escape(u.get('url', ''))
+        dom  = helper.escape(u.get('domain', ''))
+        file = helper.escape(u.get('file', ''))
+        url_rows.append(trow(f'<a href="{url}" target="_blank">{url}</a>', dom, file))
+    urls_html = table(['URL', 'Domain', 'File'], url_rows)
+
+    # Domains
+    domain_rows = []
+    for d in report_data.get('domains', []):
+        dom     = helper.escape(d.get('name', ''))
+        ip      = helper.escape(d.get('ip', 'unknown'))
+        cc      = helper.escape(d.get('country_code', '?')).upper()
+        country = helper.escape(d.get('country', 'unknown'))
+        vt_domain_url = f'https://www.virustotal.com/gui/domain/{dom}'
+        vt_ip_url = f'https://www.virustotal.com/gui/ip-address/{ip}'
+        vt_html = (f'<a href="{vt_domain_url}" target="_blank" style="margin-right:6px">&#128737; VT Domain</a>'
+                   f'<a href="{vt_ip_url}" target="_blank">&#128737; VT IP</a>')
+        domain_rows.append(trow(dom, ip, f'{cc} {country}', vt_html))
+    domains_html = table(['Domain', 'IP', 'Country', 'VirusTotal'], domain_rows)
+
+    # IPs
+    ip_rows  = [trow(helper.escape(i.get('address', '')), 'IPv4', helper.escape(i.get('file', '')))
+                for i in report_data.get('ipv4_addresses', [])]
+    ip_rows += [trow(helper.escape(i.get('address', '')), 'IPv6', helper.escape(i.get('file', '')))
+                for i in report_data.get('ipv6_addresses', [])]
+    ips_html = table(['IP Address', 'Type', 'File'], ip_rows)
+
+    # Emails
+    mail_rows = [trow(helper.escape(m.get('mail', '')), helper.escape(m.get('file', '')))
+                 for m in report_data.get('emails', [])]
+    mails_html = table(['Email', 'File'], mail_rows)
+
+    # Bitcoin
+    btc_rows = [trow(helper.escape(b.get('address', '')), helper.escape(b.get('file', '')))
+                for b in report_data.get('bitcoin_addresses', [])]
+    btc_html = table(['BTC Address', 'File'], btc_rows)
+
+    # Base64
+    b64_rows = []
+    for b in report_data.get('base64_strings', []):
+        s = b.get('string', '')
+        truncated = helper.escape(s[:80]) + ('&#8230;' if len(s) > 80 else '')
+        b64_rows.append(trow(f'<code class="b64">{truncated}</code>', helper.escape(b.get('file', ''))))
+    b64_html = table(['Base64 String (truncated to 80 chars)', 'File'], b64_rows)
+
+    # Comments
+    cmt_rows = [trow(f'<code>{helper.escape(c.get("comment", "")[:200])}</code>',
+                     helper.escape(c.get('file', '')))
+                for c in report_data.get('comments', [])]
+    cmts_html = table(['Comment', 'File'], cmt_rows)
+
+    # Source files + RetireJS
+    src_rows = []
+    for fid, info in source_data.items():
+        fname   = helper.escape(info.get('file_name', ''))
+        relpath = helper.escape(info.get('relative_path', ''))
+        fsize   = helper.escape(str(info.get('file_size', '')))
+        rjs     = info.get('retirejs_result', [])
+        if rjs:
+            vuln_names = ', '.join(
+                helper.escape(v.get('component', '?')) + ' ' + helper.escape(str(v.get('version', '')))
+                for v in rjs
+            )
+            vuln_html = f'<span class="danger">&#9888; {vuln_names}</span>'
+        else:
+            vuln_html = '<span class="clean">&#10003; clean</span>'
+        src_rows.append(trow(f'<code>{fname}</code>', relpath, fsize, vuln_html))
+    src_html = table(['File', 'Path', 'Size', 'RetireJS'], src_rows)
+
+    # Manifest
+    manifest_json = json.dumps(report_data.get('manifest', {}), indent=2)
+
+    return f'''<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SecOps Extension Analyzer &#8212; {ext_name} Report</title>
+<style>
+  :root {{
+    --bg:#0f1117;--bg2:#1a1d27;--bg3:#22263a;
+    --border:#2e3350;--text:#d0d4e8;--muted:#6b7094;
+    --accent:#00d4aa;--green:#3ecf8e;--red:#f87171;--amber:#fbbf24;
+    --code-bg:#12151f;
+  }}
+  *{{box-sizing:border-box;margin:0;padding:0}}
+  body{{background:var(--bg);color:var(--text);font:14px/1.6 'Segoe UI',system-ui,sans-serif;padding:2rem}}
+  h1{{font-size:1.4rem;font-weight:700;color:#fff;margin-bottom:.25rem}}
+  .sub{{color:var(--accent);font-size:.85rem;font-weight:500;margin-bottom:1.2rem}}
+  .meta{{color:var(--muted);font-size:12px;margin-bottom:2rem}}
+  .meta span{{margin-right:1.5rem}}
+  .summary-grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.75rem;margin-bottom:2rem}}
+  .card{{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:.9rem 1rem}}
+  .card .num{{font-size:1.8rem;font-weight:700;color:var(--accent)}}
+  .card .label{{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:.1rem}}
+  details{{background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:1rem;overflow:hidden}}
+  summary{{padding:.75rem 1rem;cursor:pointer;font-weight:500;list-style:none;display:flex;align-items:center;gap:.5rem;user-select:none}}
+  summary::-webkit-details-marker{{display:none}}
+  summary::before{{content:"&#9654;";font-size:10px;color:var(--muted);transition:transform .15s;display:inline-block}}
+  details[open] summary::before{{transform:rotate(90deg)}}
+  .section-body{{padding:0 1rem 1rem;overflow-x:auto}}
+  .badge{{background:var(--bg3);border:1px solid var(--border);border-radius:99px;padding:1px 8px;font-size:11px;color:var(--muted);margin-left:auto}}
+  table{{width:100%;border-collapse:collapse;font-size:13px}}
+  th{{text-align:left;padding:.5rem .75rem;border-bottom:1px solid var(--border);color:var(--muted);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.04em}}
+  td{{padding:.45rem .75rem;border-bottom:1px solid var(--border);word-break:break-all;vertical-align:top}}
+  tr:last-child td{{border-bottom:none}}
+  tr:hover td{{background:var(--bg3)}}
+  a{{color:var(--accent);text-decoration:none}}
+  a:hover{{text-decoration:underline}}
+  code{{background:var(--code-bg);border-radius:4px;padding:1px 5px;font-size:12px;font-family:'Cascadia Code','Fira Code',monospace}}
+  code.b64{{word-break:break-all}}
+  .empty{{color:var(--muted);padding:.5rem 0;font-style:italic}}
+  .risk{{border-radius:99px;padding:1px 8px;font-size:11px;font-weight:600}}
+  .risk-high{{background:#3d1515;color:#f87171}}
+  .risk-medium{{background:#3d2a10;color:#fbbf24}}
+  .risk-low{{background:#1a2e1a;color:#3ecf8e}}
+  .risk-none{{background:var(--bg3);color:var(--muted)}}
+  .warn{{color:var(--amber)}}
+  .danger{{color:var(--red)}}
+  .clean{{color:var(--green)}}
+  .na{{color:var(--muted)}}
+  .manifest-pre{{background:var(--code-bg);border-radius:6px;padding:1rem;overflow-x:auto;font-family:'Cascadia Code','Fira Code',monospace;font-size:12px;color:#a0b0d0;white-space:pre}}
+  .tool-badge{{display:inline-block;font-size:10px;color:var(--muted);border:1px solid var(--border);border-radius:4px;padding:1px 6px;margin-left:8px;vertical-align:middle}}
+  @media print{{
+    body{{background:#fff;color:#111;padding:1rem}}
+    .card{{border:1px solid #ddd}}
+    details{{border:1px solid #ddd;page-break-inside:avoid}}
+    a{{color:#0f7ed0}}
+  }}
+</style>
+</head>
+<body>
+<h1>{ext_name} <span style="font-weight:400;color:var(--muted)">v{ext_version}</span> <span class="tool-badge">SecOps Extension Analyzer</span></h1>
+<div class="sub">{ext_type}</div>
+<div class="meta">
+  <span>Author: {ext_author}</span>
+  <span>ID: {analysis_id}</span>
+  <span>Exported: {now}</span>
+</div>
+<p style="color:var(--muted);margin-bottom:2rem;font-size:.88rem">{ext_desc}</p>
+
+<div class="summary-grid">
+  <div class="card"><div class="num">{perm_count}</div><div class="label">Permissions</div></div>
+  <div class="card"><div class="num">{url_count}</div><div class="label">URLs</div></div>
+  <div class="card"><div class="num">{domain_count}</div><div class="label">Domains</div></div>
+  <div class="card"><div class="num">{ip_count}</div><div class="label">IP Addresses</div></div>
+  <div class="card"><div class="num">{email_count}</div><div class="label">Emails</div></div>
+  <div class="card"><div class="num">{btc_count}</div><div class="label">BTC Addresses</div></div>
+  <div class="card"><div class="num">{b64_count}</div><div class="label">Base64 Strings</div></div>
+  <div class="card"><div class="num">{comment_count}</div><div class="label">Comments</div></div>
+</div>
+
+{section("Permissions", perms_html, perm_count)}
+{section("URLs found", urls_html, url_count)}
+{section("Domains &amp; VirusTotal", domains_html, domain_count)}
+{section("IP Addresses", ips_html, ip_count)}
+{section("Email Addresses", mails_html, email_count)}
+{section("Bitcoin Addresses", btc_html, btc_count)}
+{section("Base64 Strings", b64_html, b64_count)}
+{section("Comments extracted", cmts_html, comment_count)}
+{section("Source Files &amp; RetireJS", src_html)}
+{section("Raw manifest.json", f'<div class="manifest-pre">{helper.escape(manifest_json)}</div>')}
+
+</body>
+</html>'''
+
+
+@csrf.exempt
+@app.route('/export/<analysis_id>')
+def export_analysis(analysis_id):
+    """
+    Export an analysis report.
+    Query param: ?format=html (default) | json
+    """
+    fmt = request.args.get('format', 'html').lower()
+    if fmt not in ('html', 'json'):
+        return "Invalid format. Use html or json", 400
+
+    analysis_info = core.get_result_info(analysis_id)
+    if not analysis_info[0]:
+        return f"Analysis not found: {analysis_info[1]}", 404
+
+    result_dir  = analysis_info[1]['report_directory']
+    report_path = os.path.join(result_dir, 'extanalysis_report.json')
+    source_path = os.path.join(result_dir, 'source.json')
+
+    if not os.path.isfile(report_path):
+        return "Report data file missing", 404
+
+    with open(report_path, 'r', encoding='utf-8') as f:
+        report_data = json.load(f)
+
+    source_data = {}
+    if os.path.isfile(source_path):
+        with open(source_path, 'r', encoding='utf-8') as f:
+            source_data = json.load(f)
+
+    safe_name = re.sub(r'[^\w\-]', '_', report_data.get('name', analysis_id))
+
+    if fmt == 'json':
+        payload = {
+            "meta": {
+                "analysis_id": analysis_id,
+                "exported_at": time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime()),
+                "tool": "SecOps Extension Analyzer"
+            },
+            "report": report_data,
+            "source_files": source_data
+        }
+        out = json.dumps(payload, indent=2, sort_keys=False)
+        return app.response_class(
+            response=out,
+            status=200,
+            mimetype='application/json',
+            headers={'Content-Disposition': f'attachment; filename="{safe_name}_{analysis_id}.json"'}
+        )
+
+    html_content = _build_export_html(analysis_id, report_data, source_data)
+    return app.response_class(
+        response=html_content,
+        status=200,
+        mimetype='text/html; charset=utf-8',
+        headers={'Content-Disposition': f'attachment; filename="{safe_name}_{analysis_id}.html"'}
+    )
 
 
 if __name__ == "__main__":

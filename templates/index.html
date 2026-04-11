@@ -9,7 +9,7 @@ GNU Affero General Public License v3
 
 <head>
     <meta charset="utf-8">
-    <title>ION SecOps Extension Analyzer</title>
+    <title>SecOps Extension Analyzer</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/secops.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/style.css') }}">
@@ -647,19 +647,18 @@ GNU Affero General Public License v3
 <body>
     <div class="noscript" id="noscript">
         <img src="{{ url_for('static',filename='images/error.png') }}">
-        <h1 style="font-family:var(--mono);font-size:.9rem;color:var(--muted);">JavaScript required to run ION SecOps
+        <h1 style="font-family:var(--mono);font-size:.9rem;color:var(--muted);">JavaScript required to run SecOps
             Extension Analyzer.</h1>
     </div>
 
     <div class="wrapper">
         <div class="logo-placeholder">
-            <h1 class="logo-text">ION <span>SecOps</span><br>Extension Analyzer</h1>
+            <h1 class="logo-text"><span>SecOps</span><br>Extension Analyzer</h1>
         </div>
 
         <nav class="tabs">
             <div class="selector"></div>
             <a href="#" class="active" onclick="showscan()"><i class="fas fa-bolt"></i>&nbsp; Analyze</a>
-            <a href="#" onclick="showupdate()"><i class="fas fa-cog"></i>&nbsp; Settings</a>
         </nav>
 
         <div class="container" id="container">
@@ -681,7 +680,7 @@ GNU Affero General Public License v3
             <div id="loading" style="display:none;">
                 <div class="spinner"></div>
                 <h4 style="font-family:var(--mono);font-size:.8rem;color:var(--muted);letter-spacing:.06em;max-width:300px;line-height:1.6;">
-                    ION SecOps Analyzer is performing deep computation...<br>Please stand by!
+                    SecOps Analyzer is performing deep computation...<br>Please stand by!
                 </h4>
             </div>
 
@@ -778,119 +777,6 @@ GNU Affero General Public License v3
                 </div>
             </div>
 
-            <!-- SETTINGS -->
-            <div class="update-container" id="update-container" style="display:none;">
-                <h2 class="header_for_main"><i class="fas fa-cog"></i>&nbsp; Settings</h2>
-
-                <div class="option_body">
-                    <div class="option_name" style="color:#3b82f6;border-bottom:1px solid #1e3a5f;">Basic Settings</div>
-                    <div class="sub-head-settings">VirusTotal API</div>
-                    <div class="option_description">
-                        Set or change your VirusTotal API key here. No account yet?
-                        <a class="hreflink" href="https://www.virustotal.com/gui/join-us" target="_blank">Sign up on
-                            VirusTotal</a>
-                    </div>
-                    <input type="text" id="virustotal_api" class="settings_textbox" placeholder="virustotal api key"
-                        value="{{virustotal_api}}">
-                    <br>
-                    <button class="start_scan" onclick="changeVTapi()"><i class="fas fa-check"></i> Apply</button>
-                </div>
-
-                <div class="option_body">
-                    <div class="option_name" style="color:var(--accent);border-bottom:1px solid #0d2e26;">Scan Options
-                    </div>
-                    <div class="sub-head-settings">Intel Extraction Settings</div>
-                    <div class="option_description">Select what intels you want extracted from extension files.</div>
-                    <br>
-                    <table style="border-spacing:4px 9px;">
-                        <tr>
-                            <td><i class="fas fa-comment-alt"></i> Comments:</td>
-                            <td><span class="hint--bottom hint--bounce hint--rounded hint--large"
-                                    aria-label="Set it to false if you want to skip extracting comments from files"><i
-                                        class="fas fa-question-circle"></i></span></td>
-                            <td>
-                                <div class="switch"><input id="extract_comments" type="checkbox"
-                                        class="switch-input"><label for="extract_comments"
-                                        class="switch-label">Switch</label></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><i class="fab fa-btc"></i> BTC address:</td>
-                            <td><span class="hint--bottom hint--bounce hint--rounded hint--large"
-                                    aria-label="Set this to false if you want to skip extracting bitcoin addresses from files"><i
-                                        class="fas fa-question-circle"></i></span></td>
-                            <td>
-                                <div class="switch"><input id="extract_btc_addresses" type="checkbox"
-                                        class="switch-input"><label for="extract_btc_addresses"
-                                        class="switch-label">Switch</label></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><i class="fas fa-key"></i> Base64 strings:</td>
-                            <td><span class="hint--bottom hint--bounce hint--rounded hint--large"
-                                    aria-label="Set this to false if you want to skip extracting base64 encoded strings from files"><i
-                                        class="fas fa-question-circle"></i></span></td>
-                            <td>
-                                <div class="switch"><input id="extract_base64_strings" type="checkbox"
-                                        class="switch-input"><label for="extract_base64_strings"
-                                        class="switch-label">Switch</label></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><i class="fas fa-at"></i> Email Addresses:</td>
-                            <td><span class="hint--bottom hint--bounce hint--rounded hint--large"
-                                    aria-label="Set this to false to skip extracting email addresses from files!"><i
-                                        class="fas fa-question-circle"></i></span></td>
-                            <td>
-                                <div class="switch"><input id="extract_email_addresses" type="checkbox"
-                                        class="switch-input"><label for="extract_email_addresses"
-                                        class="switch-label">Switch</label></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><i class="fas fa-map-marker-alt"></i> IPv4 addresses:</td>
-                            <td><span class="hint--bottom hint--bounce hint--rounded hint--large"
-                                    aria-label="Set this to false if you want to skip extracting IPv4 addresses from files"><i
-                                        class="fas fa-question-circle"></i></span></td>
-                            <td>
-                                <div class="switch"><input id="extract_ipv4_addresses" type="checkbox"
-                                        class="switch-input"><label for="extract_ipv4_addresses"
-                                        class="switch-label">Switch</label></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><i class="fas fa-map-marker-alt"></i> IPv6 addresses:</td>
-                            <td><span class="hint--bottom hint--bounce hint--rounded hint--large"
-                                    aria-label="set this to false if you want to skip extracting IPv6 addresses from files"><i
-                                        class="fas fa-question-circle"></i></span></td>
-                            <td>
-                                <div class="switch"><input id="extract_ipv6_addresses" type="checkbox"
-                                        class="switch-input"><label for="extract_ipv6_addresses"
-                                        class="switch-label">Switch</label></div>
-                            </td>
-                        </tr>
-                    </table>
-                    <br>
-                    <div class="sub-head-settings">Other Scan Settings</div>
-                    <div class="option_description">Miscellaneous scan options.</div>
-                    <br>
-                    <table style="border-spacing:4px 9px;">
-                        <tr>
-                            <td><i class="fab fa-css3-alt"></i> Ignore CSS Files:</td>
-                            <td><span class="hint--bottom hint--bounce hint--rounded hint--large"
-                                    aria-label="Set this to false if you want to analyze css files. Disabled by default as css files contain a lot of junk!"><i
-                                        class="fas fa-question-circle"></i></span></td>
-                            <td>
-                                <div class="switch"><input id="ignore_css" type="checkbox" class="switch-input"><label
-                                        for="ignore_css" class="switch-label">Switch</label></div>
-                            </td>
-                        </tr>
-                    </table>
-                    <br><br>
-                    <button class="start_scan" onclick="updateIntelExtraction()"><i class="fas fa-check"></i> Save
-                        Settings</button>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -907,15 +793,6 @@ GNU Affero General Public License v3
                 $(this).addClass('current');
                 $("#" + tab_id).addClass('current');
             });
-
-            var settings = {{ settings_json | safe }};
-        if (settings['extract_base64_strings'] === true) $('#extract_base64_strings')[0].checked = true;
-        if (settings['extract_btc_addresses'] === true) $('#extract_btc_addresses')[0].checked = true;
-        if (settings['extract_comments'] === true) $('#extract_comments')[0].checked = true;
-        if (settings['extract_email_addresses'] === true) $('#extract_email_addresses')[0].checked = true;
-        if (settings['extract_ipv4_addresses'] === true) $('#extract_ipv4_addresses')[0].checked = true;
-        if (settings['extract_ipv6_addresses'] === true) $('#extract_ipv6_addresses')[0].checked = true;
-        if (settings['ignore_css'] === true) $('#ignore_css')[0].checked = true;
         });
     </script>
 </body>
