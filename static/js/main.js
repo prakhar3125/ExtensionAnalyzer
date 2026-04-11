@@ -1,5 +1,5 @@
 /**
- * ION SecOps Extension Analyzer — main.js
+ * SecOps Extension Analyzer — main.js
  * Based on ExtAnalysis by Tuhinshubhra (AGPL-3.0)
  * Refactored: ES6+, DRY helpers, custom toast system
  */
@@ -115,7 +115,7 @@ function openModal(html) {
 function modalError(msg) {
   openModal(`
     <div style="text-align:center;padding:1rem;">
-      <img src="/static/images/error.png" style="width:180px;margin:1rem;opacity:.8;">
+      <div style="font-size:2.5rem;margin:1rem;color:#ef4444;font-weight:bold;letter-spacing:2px;">ERROR</div>
       <h3 style="font-family:'JetBrains Mono',monospace;font-size:.9rem;color:#ef4444;margin-top:.5rem;">${msg}</h3>
     </div>`);
 }
@@ -123,7 +123,7 @@ function modalError(msg) {
 function modalSuccess(msg, extraHtml = '') {
   openModal(`
     <div style="text-align:center;padding:1rem;">
-      <img src="/static/images/success.png" style="width:180px;margin:1rem;opacity:.85;">
+      <div style="font-size:2.5rem;margin:1rem;color:#00d4aa;font-weight:bold;letter-spacing:2px;">SUCCESS</div>
       <h3 style="font-family:'JetBrains Mono',monospace;font-size:.9rem;color:#00d4aa;margin-top:.5rem;">${msg}</h3>
       ${extraHtml}
     </div>`);

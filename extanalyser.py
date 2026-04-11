@@ -3642,7 +3642,7 @@ def allowed_file(filename):
 
 
 csrf = CSRFProtect()
-app = Flask('ION SecOps Extension Analyzer')
+app = Flask('SecOps Extension Analyzer')
 core.lab_path = core.lab_path
 app.secret_key = str(os.urandom(24))
 csrf.init_app(app)

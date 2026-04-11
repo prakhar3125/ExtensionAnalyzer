@@ -23,4 +23,4 @@ RUN chown -R extanalysis:extanalysis /app
 USER extanalysis
 
 EXPOSE 13337
-ENTRYPOINT ["python3", "extanalysis.py"]
+ENTRYPOINT ["python3", "extanalyser.py"]
