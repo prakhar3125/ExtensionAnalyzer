@@ -5,3 +5,5 @@ maxminddb
 Flask-WTF
 certifi
 gunicorn
+
+reportlab

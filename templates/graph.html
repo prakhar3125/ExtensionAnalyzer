@@ -9,7 +9,7 @@ GNU Affero General Public License v3
 
 <head>
     <meta charset="utf-8">
-    <title>Graph Viewer | SecOps Extension Analyzer</title>
+    <title>Graph Viewer - SecOps Extension Analyzer</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bttn.css') }}">
     <script type="text/javascript" src="{{ url_for('static',filename='js/vis.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static',filename='js/fontawesome.min.js') }}"></script>
@@ -143,16 +143,6 @@ GNU Affero General Public License v3
             flex-shrink: 0;
             z-index: 10;
             position: relative;
-        }
-
-        .logo-placeholder::before {
-            content: '';
-            display: block;
-            width: 4px;
-            height: 30px;
-            background: linear-gradient(180deg, var(--accent), var(--accent2));
-            border-radius: 3px;
-            flex-shrink: 0;
         }
 
         .logo-placeholder a {

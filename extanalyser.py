@@ -35,6 +35,8 @@ import urllib.request
 import webbrowser
 import zipfile
 
+import core.pdf_exporter as pdf_exporter
+
 import sys
 _m = sys.modules[__name__]
 _m.core = _m
@@ -3965,8 +3967,8 @@ def export_analysis(analysis_id):
     Query param: ?format=html (default) | json
     """
     fmt = request.args.get('format', 'html').lower()
-    if fmt not in ('html', 'json'):
-        return "Invalid format. Use html or json", 400
+    if fmt not in ('html', 'json', 'pdf'):
+        return "Invalid format. Use html, json, or pdf", 400
 
     analysis_info = core.get_result_info(analysis_id)
     if not analysis_info[0]:
@@ -4006,6 +4008,23 @@ def export_analysis(analysis_id):
             mimetype='application/json',
             headers={'Content-Disposition': f'attachment; filename="{safe_name}_{analysis_id}.json"'}
         )
+
+    if fmt == 'pdf':
+        try:
+            pdf_bytes = pdf_exporter.generate_pdf(report_data, source_data, analysis_id)
+            return app.response_class(
+                response=pdf_bytes,
+                status=200,
+                mimetype='application/pdf',
+                headers={
+                    'Content-Disposition': (
+                        f'attachment; filename="{safe_name}_{analysis_id}.pdf"'
+                    )
+                }
+            )
+        except Exception as e:
+            logging.error(traceback.format_exc())
+            return f'PDF generation failed: {e}', 500
 
     html_content = _build_export_html(analysis_id, report_data, source_data)
     return app.response_class(
